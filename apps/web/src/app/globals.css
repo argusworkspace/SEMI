@@ -1,1 +1,192 @@
 @import "tailwindcss";
+
+/* ── SEMY Design Tokens — Tailwind v4 @theme ────────────────────────────────
+   In Tailwind v4, theme tokens live here instead of tailwind.config.ts.
+   Utility classes like bg-paper, text-asphalt, font-display all still work.
+   ─────────────────────────────────────────────────────────────────────────── */
+@theme {
+  /* Colors */
+  --color-asphalt:  #1C1F22;
+  --color-paper:    #F6F4EF;
+  --color-volt:     #C8F135;
+  --color-amber:    #E8772E;
+  --color-steel:    #5B6470;
+  --color-hairline: #DEDAD0;
+
+  /* Font families */
+  --font-display: var(--font-space-grotesk), sans-serif;
+  --font-body:    var(--font-inter), sans-serif;
+
+  /* Font sizes with line-height */
+  --font-size-h1:         44px;
+  --line-height-h1:       52px;
+  --font-size-h2:         30px;
+  --line-height-h2:       38px;
+  --font-size-h3:         20px;
+  --line-height-h3:       28px;
+  --font-size-body:       16px;
+  --line-height-body:     24px;
+  --font-size-caption:    13px;
+  --line-height-caption:  18px;
+  --font-size-spec-label: 12px;
+
+  /* Border radius — 2px everywhere, sharp spec-plate feel */
+  --radius:    2px;
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: 2px;
+  --radius-xl: 2px;
+
+  /* Layout */
+  --max-width-layout: 1200px;
+
+  /* Shadows — intentionally none per design spec */
+  --shadow:    none;
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+  --shadow-xl: none;
+}
+
+/* ── SEMY CSS Custom Properties (non-Tailwind utilities) ────────────────────── */
+:root {
+  --layout-max-width:       1200px;
+  --layout-padding-mobile:  20px;
+  --layout-padding-desktop: 64px;
+  --border-radius:          2px;
+  --border-standard:        1px solid var(--color-hairline);
+  --border-tearline:        1px dashed var(--color-hairline);
+}
+
+/* ── Base reset ─────────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  /* No box-shadows per design spec */
+  box-shadow: none !important;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-asphalt);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+/* ── Typography scale ───────────────────────────────────────────────────────── */
+h1, .h1 {
+  font-family: var(--font-space-grotesk), sans-serif;
+  font-size: 44px;
+  line-height: 52px;
+  font-weight: 700;
+  color: var(--color-asphalt);
+}
+
+h2, .h2 {
+  font-family: var(--font-space-grotesk), sans-serif;
+  font-size: 30px;
+  line-height: 38px;
+  font-weight: 600;
+  color: var(--color-asphalt);
+}
+
+h3, .h3 {
+  font-family: var(--font-space-grotesk), sans-serif;
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 600;
+  color: var(--color-asphalt);
+}
+
+.caption {
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 400;
+  color: var(--color-steel);
+}
+
+.spec-label {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-steel);
+}
+
+/* ── Layout utilities ───────────────────────────────────────────────────────── */
+.layout-container {
+  width: 100%;
+  max-width: var(--layout-max-width);
+  margin-inline: auto;
+  padding-inline: var(--layout-padding-mobile);
+}
+
+@media (min-width: 1024px) {
+  .layout-container {
+    padding-inline: var(--layout-padding-desktop);
+  }
+}
+
+/* Borders */
+.border-standard { border: var(--border-standard); }
+.border-tearline  { border: var(--border-tearline); }
+
+/* Text balance */
+.text-balance { text-wrap: balance; }
+
+/* Footer link hover — CSS-only so Footer stays a Server Component */
+.footer-link {
+  opacity: 0.72;
+  transition: opacity 150ms ease;
+}
+.footer-link:hover {
+  opacity: 1;
+}
+
+/* Footer 3-col grid */
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px 48px;
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .footer-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .footer-grid {
+    grid-template-columns: 2fr 1fr 1fr;
+  }
+}
+
+/* Product detail page — two-column layout */
+.product-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+
+@media (min-width: 768px) {
+  .product-detail-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+}
+
+@media (min-width: 1024px) {
+  .product-detail-grid {
+    grid-template-columns: 5fr 4fr;
+  }
+}

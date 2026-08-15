@@ -1,0 +1,11 @@
+from pydantic import BaseModel
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+
+
+class LoginForm(BaseModel):
+    username: str  # OAuth2 form uses "username" field
+    password: str

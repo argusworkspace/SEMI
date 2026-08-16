@@ -19,8 +19,24 @@ class Settings(BaseSettings):
     ocr_space_api_key: str = "helloworld"  # "helloworld" is the public demo key (rate-limited)
 
     # Manual payment UPI details shown to customer
-    payment_upi_id: str = "semy@ybl"
-    payment_upi_name: str = "SEMY Mobility"
+    payment_upi_id: str = "semy@indianbnk"
+    payment_upi_name: str = "M S SEMY"
+
+    # Seller / invoice details
+    seller_legal_name: str = "M S SEMY"
+    seller_trade_name: str = "SEMY Mobility"
+    seller_address: str = ""
+    seller_gstin: str = ""
+    seller_state: str = "Tamil Nadu"
+    seller_state_code: str = "33"
+    seller_email: str = ""
+    seller_bank_name: str = "Indian Bank"
+    seller_bank_account: str = ""
+    seller_bank_ifsc: str = ""
+
+    # Product / GST
+    product_hsn: str = "8712"
+    gst_rate: float = 12.0   # total GST % (split equally as CGST + SGST)
 
     @property
     def cashfree_base_url(self) -> str:

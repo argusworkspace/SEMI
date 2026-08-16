@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  web:
+    name: Next.js lint & type-check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint --workspace=apps/web
+
+      - name: Type-check
+        run: npx tsc --noEmit
+        working-directory: apps/web
+
+  api:
+    name: FastAPI type-check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        working-directory: apps/api
+        run: pip install -e ".[dev]"
+
+      - name: Pyright
+        working-directory: apps/api
+        run: |
+          pip install pyright --quiet
+          pyright src --pythonpath $(python -c "import sys; print(sys.executable)")
+        continue-on-error: true

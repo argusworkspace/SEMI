@@ -26,8 +26,8 @@ export const MOCK_PRODUCTS: Product[] = [
     ],
     price: 27000,
     priceNote: "incl. tax",
-    advanceAmount: 2000,
-    imageUrl: "/images/products/xpro.png",
+    advanceAmount: 5000,
+    imageUrl: "/images/products/xpro.svg",
     inStock: true,
   },
   {
@@ -53,8 +53,8 @@ export const MOCK_PRODUCTS: Product[] = [
     ],
     price: 25000,
     priceNote: "incl. tax",
-    advanceAmount: 2000,
-    imageUrl: "/images/products/x-variant.png",
+    advanceAmount: 5000,
+    imageUrl: "/images/products/x-variant.svg",
     inStock: true,
   },
 ];

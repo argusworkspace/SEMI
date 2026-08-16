@@ -19,20 +19,24 @@ function fmt(n: number) {
 
 export default function ProductCard({ product }: { product: Product }) {
   const [modalOpen, setModalOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   return (
     <>
       {/* ── Card ────────────────────────────────────────────────────────── */}
       <article
         style={{
-          border: `1px solid ${COLOR_HAIRLINE}`,
+          border: `1px solid ${isHovered ? COLOR_VOLT : COLOR_HAIRLINE}`,
           borderRadius: 2,
           backgroundColor: "#FFFFFF",
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
+          transition: "border-color 150ms ease",
         }}
         aria-label={`${product.name} product card`}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       >
         {/* Image placeholder */}
         <div
@@ -43,13 +47,19 @@ export default function ProductCard({ product }: { product: Product }) {
             alignItems: "center",
             justifyContent: "center",
             position: "relative",
+            overflow: "hidden",
           }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={product.imageUrl}
             alt={product.name}
-            style={{ maxHeight: 180, objectFit: "contain" }}
+            style={{
+              maxHeight: 180,
+              objectFit: "contain",
+              transform: isHovered ? "scale(1.02)" : "scale(1)",
+              transition: "transform 150ms ease",
+            }}
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).style.display = "none";
             }}
@@ -61,14 +71,14 @@ export default function ProductCard({ product }: { product: Product }) {
               top: 12,
               right: 12,
               fontSize: 11,
-              fontWeight: 600,
+              fontWeight: 700,
               letterSpacing: "0.08em",
               textTransform: "uppercase",
-              padding: "3px 8px",
+              padding: "6px 12px",
               borderRadius: 2,
-              backgroundColor: product.inStock ? "rgba(200,241,53,0.15)" : "rgba(200,200,200,0.2)",
-              color: product.inStock ? "#5a8a00" : COLOR_STEEL,
-              border: `1px solid ${product.inStock ? "rgba(200,241,53,0.4)" : COLOR_HAIRLINE}`,
+              backgroundColor: product.inStock ? COLOR_VOLT : "#E5E5E5",
+              color: product.inStock ? COLOR_ASPHALT : COLOR_STEEL,
+              border: "none",
               fontFamily: "var(--font-inter), sans-serif",
             }}
           >

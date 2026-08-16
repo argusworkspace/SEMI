@@ -54,6 +54,9 @@ function FooterLink({
     textDecoration: "none",
     display: "block",
     marginBottom: 10,
+    minHeight: 44,
+    display: "flex",
+    alignItems: "center",
   };
 
   if (external) {

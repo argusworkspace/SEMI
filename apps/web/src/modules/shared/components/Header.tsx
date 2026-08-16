@@ -5,10 +5,10 @@ import { useState, useEffect, useRef } from "react";
 import { COLOR_ASPHALT, COLOR_PAPER, COLOR_VOLT, COLOR_STEEL } from "@/lib/design-tokens";
 
 const NAV_LINKS = [
-  { label: "Products",      href: "/products" },
-  { label: "Manufacturing", href: "/manufacturing" },
-  { label: "About",         href: "/about" },
-  { label: "Contact",       href: "/contact" },
+  { label: "Products",      href: "#products" },
+  { label: "Manufacturing", href: "#manufacturing" },
+  { label: "About",         href: "#about" },
+  { label: "Contact",       href: "#contact" },
 ];
 
 export default function Header() {
@@ -87,7 +87,7 @@ export default function Header() {
         {/* ── Desktop nav (right) ─────────────────────────────────────── */}
         <nav aria-label="Primary navigation" className="hidden md:flex items-center gap-8">
           {NAV_LINKS.map((link) => (
-            <Link
+            <a
               key={link.href}
               href={link.href}
               style={{
@@ -104,7 +104,7 @@ export default function Header() {
               onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.opacity = "0.85")}
             >
               {link.label}
-            </Link>
+            </a>
           ))}
         </nav>
 
@@ -174,7 +174,7 @@ export default function Header() {
       >
         <nav className="layout-container flex flex-col py-4 gap-1">
           {NAV_LINKS.map((link) => (
-            <Link
+            <a
               key={link.href}
               href={link.href}
               onClick={() => setMobileOpen(false)}
@@ -191,7 +191,7 @@ export default function Header() {
               }}
             >
               {link.label}
-            </Link>
+            </a>
           ))}
 
           {/* Small volt accent line at bottom of panel */}

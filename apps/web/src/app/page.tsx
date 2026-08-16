@@ -1,416 +1,610 @@
-import Link from "next/link";
+"use client";
+
+import { useEffect, useRef, useState } from "react";
 import ProductCard from "@/modules/products/components/ProductCard";
+import AchievementsStrip from "@/modules/shared/components/AchievementsStrip";
 import { MOCK_PRODUCTS } from "@/lib/mock-products";
-import FadeIn from "@/modules/shared/components/FadeIn";
-import {
-  COLOR_ASPHALT,
-  COLOR_PAPER,
-  COLOR_VOLT,
-  COLOR_AMBER,
-  COLOR_STEEL,
-  COLOR_HAIRLINE,
-} from "@/lib/design-tokens";
+import { COLOR_ASPHALT, COLOR_VOLT, COLOR_PAPER, COLOR_STEEL, COLOR_HAIRLINE } from "@/lib/design-tokens";
 
-// ── Icons for the Feature Strip ───────────────────────────────────────────────
-const IconLeaf = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
-    <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
-  </svg>
-);
-
-const IconCpu = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="4" y="4" width="16" height="16" rx="2" ry="2" />
-    <rect x="9" y="9" width="6" height="6" />
-    <line x1="9" y1="1" x2="9" y2="4" />
-    <line x1="15" y1="1" x2="15" y2="4" />
-    <line x1="9" y1="20" x2="9" y2="23" />
-    <line x1="15" y1="20" x2="15" y2="23" />
-    <line x1="20" y1="9" x2="23" y2="9" />
-    <line x1="20" y1="14" x2="23" y2="14" />
-    <line x1="1" y1="9" x2="4" y2="9" />
-    <line x1="1" y1="14" x2="4" y2="14" />
-  </svg>
-);
-
-const IconShield = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-  </svg>
-);
+// Placeholder achievement data — client will supply real numbers later
+const ACHIEVEMENTS = [
+  { value: "500+", label: "Bikes Delivered" },
+  { value: "50+", label: "Campus Drives Completed" },
+  { value: "25+", label: "Cities Served" },
+  { value: "98%", label: "Customer Satisfaction" },
+];
 
 export default function Home() {
+  const productGridRef = useRef<HTMLDivElement>(null);
+  const [activeSection, setActiveSection] = useState("home");
+
+  useEffect(() => {
+    const cards = productGridRef.current?.querySelectorAll(".product-card-wrapper");
+    if (!cards || cards.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const index = parseInt(entry.target.getAttribute("data-index") || "0");
+            setTimeout(() => {
+              entry.target.classList.add("visible");
+            }, index * 80); // 80ms stagger
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        threshold: 0.1,
+        rootMargin: "0px 0px -50px 0px",
+      }
+    );
+
+    cards.forEach((card) => observer.observe(card));
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Handle hash changes for section navigation
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.slice(1) || "home";
+      setActiveSection(hash);
+      
+      // Scroll to section
+      const element = document.getElementById(hash);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    };
+
+    handleHashChange(); // Initial load
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, []);
+
+  const scrollToProducts = () => {
+    window.location.hash = "products";
+  };
+
   return (
     <>
-      {/* ── 1. Hero Section (Split Layout) ─────────────────────────────────── */}
+      {/* ── Hero Section ────────────────────────────────────────────────── */}
       <section
+        id="home"
         style={{
+          backgroundColor: COLOR_ASPHALT,
+          minHeight: "60vh",
           display: "flex",
-          flexDirection: "column",
-          // Approx height to fill viewport below header on desktop
-          minHeight: "calc(100vh - 72px)",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "60px 20px",
+          position: "relative",
+          overflow: "hidden",
         }}
+        className="hero-section"
       >
         <div
           style={{
-            display: "flex",
-            flex: 1,
-            flexDirection: "column",
+            maxWidth: "1200px",
+            width: "100%",
+            textAlign: "center",
+            animation: "heroFadeSlideUp 0.8s ease-out forwards",
+            opacity: 0,
           }}
-          className="md:flex-row" // Tailwind utility for desktop row layout
         >
-          {/* Left: Copy & CTAs (Asphalt) */}
-          <div
+          <h1
             style={{
-              flex: 1,
-              backgroundColor: COLOR_ASPHALT,
-              color: COLOR_PAPER,
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              padding: "64px 8%",
+              fontFamily: "var(--font-space-grotesk), sans-serif",
+              fontSize: "clamp(32px, 8vw, 64px)",
+              fontWeight: 700,
+              color: "#FFFFFF",
+              marginBottom: 20,
+              lineHeight: 1.1,
+              padding: "0 10px",
             }}
           >
-            <FadeIn>
-              <h1
-                style={{
-                  fontFamily: "var(--font-space-grotesk), sans-serif",
-                  fontSize: 48,
-                  lineHeight: 1.1,
-                  fontWeight: 700,
-                  marginBottom: 24,
-                  maxWidth: 600,
-                }}
-              >
-                Urban Mobility, Reimagined
-              </h1>
-              <p
-                style={{
-                  fontFamily: "var(--font-inter), sans-serif",
-                  fontSize: 18,
-                  lineHeight: 1.5,
-                  opacity: 0.8,
-                  marginBottom: 40,
-                  maxWidth: 480,
-                }}
-              >
-                Built tough, designed sharp — electric two-wheelers that earn
-                their keep every kilometre.
-              </p>
-
-              <div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: 16,
-                }}
-              >
-                <Link
-                  href="#our-bikes"
-                  style={{
-                    backgroundColor: COLOR_VOLT,
-                    color: COLOR_ASPHALT,
-                    fontFamily: "var(--font-space-grotesk), sans-serif",
-                    fontSize: 15,
-                    fontWeight: 700,
-                    padding: "14px 28px",
-                    textDecoration: "none",
-                    borderRadius: 2,
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    transition: "opacity 150ms ease",
-                  }}
-                  className="hover:opacity-90"
-                >
-                  Explore Our Range
-                </Link>
-                <Link
-                  href="#our-bikes"
-                  style={{
-                    backgroundColor: "transparent",
-                    color: COLOR_AMBER,
-                    border: `1px solid ${COLOR_AMBER}`,
-                    fontFamily: "var(--font-inter), sans-serif",
-                    fontSize: 15,
-                    fontWeight: 500,
-                    padding: "14px 28px",
-                    textDecoration: "none",
-                    borderRadius: 2,
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    transition: "background-color 150ms ease",
-                  }}
-                  className="hover:bg-[rgba(232,119,46,0.08)]"
-                >
-                  Book with ₹2,000 Advance
-                </Link>
-              </div>
-            </FadeIn>
-          </div>
-
-          {/* Right: Full-height Product Image */}
-          <div
+            Urban mobility, reimagined
+            <br />
+            for Indian roads.
+          </h1>
+          <p
             style={{
-              flex: 1,
-              backgroundColor: "#F0EEE9",
-              position: "relative",
-              minHeight: "45vh",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "40px",
+              fontFamily: "var(--font-inter), sans-serif",
+              fontSize: "clamp(15px, 4vw, 20px)",
+              color: COLOR_STEEL,
+              marginBottom: 32,
+              maxWidth: "600px",
+              marginLeft: "auto",
+              marginRight: "auto",
+              lineHeight: 1.6,
+              padding: "0 10px",
             }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/products/xpro.png"
-              alt="SEMY Xpro"
-              style={{
-                width: "100%",
-                height: "100%",
-                maxHeight: "80vh",
-                objectFit: "contain",
-                display: "block",
-              }}
-            />
-          </div>
+            Electric bikes built for power, range, and everyday reliability.
+            Book yours with just ₹5,000 advance.
+          </p>
+          <button
+            onClick={scrollToProducts}
+            style={{
+              backgroundColor: COLOR_VOLT,
+              color: COLOR_ASPHALT,
+              fontFamily: "var(--font-space-grotesk), sans-serif",
+              fontSize: 16,
+              fontWeight: 700,
+              padding: "16px 40px",
+              border: "none",
+              borderRadius: 2,
+              cursor: "pointer",
+              transition: "transform 150ms ease, opacity 150ms ease",
+              width: "auto",
+              maxWidth: "100%",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-2px)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+            }}
+            className="hero-cta"
+          >
+            Explore Our Bikes
+          </button>
         </div>
+
+        <style jsx>{`
+          @keyframes heroFadeSlideUp {
+            from {
+              opacity: 0;
+              transform: translateY(30px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+
+          @media (max-width: 640px) {
+            .hero-cta {
+              width: 100% !important;
+              padding: 18px 24px !important;
+            }
+          }
+        `}</style>
       </section>
 
-      {/* ── 2. Feature Strip ─────────────────────────────────────────────────── */}
+      {/* ── Achievements Section ────────────────────────────────────────── */}
+      <AchievementsStrip achievements={ACHIEVEMENTS} />
+
+      {/* ── Products Section ────────────────────────────────────────────── */}
       <section
+        id="products"
+        className="layout-container"
         style={{
-          borderBottom: `1px solid ${COLOR_HAIRLINE}`,
+          paddingTop: 80,
+          paddingBottom: 64,
           backgroundColor: COLOR_PAPER,
         }}
       >
+        <h2
+          style={{
+            fontFamily: "var(--font-space-grotesk), sans-serif",
+            fontSize: 30,
+            fontWeight: 700,
+            marginBottom: 8,
+          }}
+        >
+          Our Bikes
+        </h2>
+        <p
+          style={{
+            fontSize: 15,
+            color: "#5B6470",
+            marginBottom: 36,
+            fontFamily: "var(--font-inter), sans-serif",
+          }}
+        >
+          Reserve yours with a{" "}
+          <strong style={{ color: "#1C1F22" }}>₹5,000 advance</strong> — balance
+          collected on delivery.
+        </p>
+
+        <div
+          ref={productGridRef}
+          id="product-grid"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+            gap: 24,
+          }}
+          className="product-grid"
+        >
+          {MOCK_PRODUCTS.map((p, index) => (
+            <div
+              key={p.id}
+              className="product-card-wrapper"
+              data-index={index}
+              style={{
+                opacity: 0,
+                transform: "translateY(20px)",
+                transition: "opacity 0.6s ease, transform 0.6s ease",
+              }}
+            >
+              <ProductCard product={p} />
+            </div>
+          ))}
+        </div>
+
+        <style jsx>{`
+          :global(.product-card-wrapper.visible) {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+          }
+
+          @media (max-width: 640px) {
+            .product-grid {
+              grid-template-columns: 1fr !important;
+            }
+          }
+        `}</style>
+      </section>
+
+      {/* ── Manufacturing Section ───────────────────────────────────────── */}
+      <section
+        id="manufacturing"
+        style={{
+          backgroundColor: COLOR_ASPHALT,
+          padding: "80px 20px 60px",
+        }}
+      >
         <div className="layout-container">
+          <h2
+            style={{
+              fontFamily: "var(--font-space-grotesk), sans-serif",
+              fontSize: "clamp(28px, 5vw, 48px)",
+              fontWeight: 700,
+              color: "#FFFFFF",
+              marginBottom: 20,
+              textAlign: "center",
+            }}
+          >
+            Manufacturing Excellence
+          </h2>
+          <p
+            style={{
+              fontFamily: "var(--font-inter), sans-serif",
+              fontSize: "clamp(14px, 3vw, 18px)",
+              color: COLOR_STEEL,
+              maxWidth: "600px",
+              margin: "0 auto 48px",
+              textAlign: "center",
+              lineHeight: 1.6,
+              padding: "0 10px",
+            }}
+          >
+            Built with precision, tested for durability. Every SEMY bike is
+            engineered to handle Indian road conditions.
+          </p>
+
           <div
             style={{
               display: "grid",
-              // Use tailwind classes for grid responsiveness
-              gridTemplateColumns: "repeat(1, 1fr)",
+              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+              gap: 24,
             }}
-            className="md:grid-cols-3"
+            className="manufacturing-cards"
           >
             {[
               {
-                icon: <IconLeaf />,
-                title: "Eco-Friendly",
-                caption: "Zero emissions, silent operation, and high-efficiency battery tech.",
+                title: "Frame Welding",
+                description:
+                  "High-strength steel frames welded using automated jigs for perfect alignment and durability.",
               },
               {
-                icon: <IconCpu />,
-                title: "Advanced Manufacturing",
-                caption: "Precision-engineered frames and intelligent powertrain management.",
+                title: "Component Integration",
+                description:
+                  "Battery, motor, and electronics integrated with strict quality checks at each stage.",
               },
               {
-                icon: <IconShield />,
-                title: "Premium Quality",
-                caption: "Rigorous testing and high-grade materials for lasting durability.",
+                title: "Road Testing",
+                description:
+                  "Every bike undergoes real-world testing on various terrains before shipment.",
               },
-            ].map((feature, i) => (
+            ].map((step) => (
               <div
-                key={i}
+                key={step.title}
                 style={{
-                  padding: "48px 32px",
-                  borderBottom: `1px solid ${COLOR_HAIRLINE}`,
+                  backgroundColor: "rgba(255,255,255,0.05)",
+                  border: `1px solid rgba(255,255,255,0.1)`,
+                  borderRadius: 2,
+                  padding: 24,
+                  transition: "border-color 150ms ease, background-color 150ms ease",
+                  minHeight: "44px",
                 }}
-                className="md:border-b-0 md:border-r last:border-r-0 md:border-[var(--color-hairline)]"
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = COLOR_VOLT;
+                  e.currentTarget.style.backgroundColor = "rgba(200,241,53,0.05)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)";
+                  e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.05)";
+                }}
               >
-                <FadeIn delay={i * 100}>
-                  <div
-                    style={{
-                      color: COLOR_STEEL,
-                      marginBottom: 16,
-                    }}
-                  >
-                    {feature.icon}
-                  </div>
-                  <h3
-                    style={{
-                      fontFamily: "var(--font-space-grotesk), sans-serif",
-                      fontSize: 18,
-                      fontWeight: 700,
-                      color: COLOR_ASPHALT,
-                      marginBottom: 8,
-                    }}
-                  >
-                    {feature.title}
-                  </h3>
-                  <p
-                    style={{
-                      fontFamily: "var(--font-inter), sans-serif",
-                      fontSize: 14,
-                      lineHeight: 1.5,
-                      color: COLOR_STEEL,
-                      margin: 0,
-                    }}
-                  >
-                    {feature.caption}
-                  </p>
-                </FadeIn>
+                <h3
+                  style={{
+                    fontFamily: "var(--font-space-grotesk), sans-serif",
+                    fontSize: 18,
+                    fontWeight: 700,
+                    color: COLOR_VOLT,
+                    marginBottom: 12,
+                  }}
+                >
+                  {step.title}
+                </h3>
+                <p
+                  style={{
+                    fontFamily: "var(--font-inter), sans-serif",
+                    fontSize: 14,
+                    color: COLOR_PAPER,
+                    lineHeight: 1.6,
+                    margin: 0,
+                    opacity: 0.8,
+                  }}
+                >
+                  {step.description}
+                </p>
               </div>
             ))}
           </div>
         </div>
+
+        <style jsx>{`
+          @media (max-width: 640px) {
+            .manufacturing-cards {
+              grid-template-columns: 1fr !important;
+            }
+          }
+        `}</style>
       </section>
 
-      {/* ── 3. Featured Range ────────────────────────────────────────────────── */}
-      <section id="our-bikes" style={{ backgroundColor: COLOR_PAPER, padding: "96px 0" }}>
-        <div className="layout-container">
-          <FadeIn>
-            <h2
-              style={{
-                fontFamily: "var(--font-space-grotesk), sans-serif",
-                fontSize: 32,
-                fontWeight: 700,
-                color: COLOR_ASPHALT,
-                marginBottom: 12,
-              }}
-            >
-              Our Featured Range
-            </h2>
-            <p
-              style={{
-                fontFamily: "var(--font-inter), sans-serif",
-                fontSize: 16,
-                color: COLOR_STEEL,
-                marginBottom: 48,
-              }}
-            >
-              Built to perform. Designed to endure.
-            </p>
-          </FadeIn>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-              gap: 32,
-            }}
-          >
-            {MOCK_PRODUCTS.map((p, i) => (
-              <FadeIn key={p.id} delay={i * 150}>
-                <ProductCard product={p} />
-              </FadeIn>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 4. Advance Payment, Simply ───────────────────────────────────────── */}
+      {/* ── About Section ───────────────────────────────────────────────── */}
       <section
+        id="about"
+        className="layout-container"
         style={{
-          borderTop: `1px solid ${COLOR_HAIRLINE}`,
+          paddingTop: 80,
+          paddingBottom: 80,
           backgroundColor: COLOR_PAPER,
-          padding: "96px 0",
         }}
       >
-        <div className="layout-container">
-          <FadeIn>
-            <div style={{ maxWidth: 800 }}>
-              <h2
+        <h2
+          style={{
+            fontFamily: "var(--font-space-grotesk), sans-serif",
+            fontSize: 28,
+            fontWeight: 700,
+            color: COLOR_ASPHALT,
+            marginBottom: 48,
+            textAlign: "center",
+          }}
+        >
+          About SEMY
+        </h2>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+            gap: 32,
+            maxWidth: "900px",
+            margin: "0 auto",
+          }}
+        >
+          {[
+            {
+              label: "Mission",
+              title: "Accessible Electric Mobility",
+              description:
+                "Make electric two-wheelers affordable, reliable, and practical for every Indian commuter.",
+            },
+            {
+              label: "Vision",
+              title: "Cleaner, Smarter Cities",
+              description:
+                "Lead India's transition to sustainable urban transport through innovation and quality.",
+            },
+            {
+              label: "Values",
+              title: "Built to Last",
+              description:
+                "Honest pricing, customer-first service, and products designed for durability. Made in India 🇮🇳",
+            },
+          ].map((item) => (
+            <div
+              key={item.label}
+              style={{
+                backgroundColor: "#FFFFFF",
+                border: `1px solid ${COLOR_HAIRLINE}`,
+                borderRadius: 2,
+                padding: 32,
+                transition: "border-color 150ms ease, transform 150ms ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = COLOR_VOLT;
+                e.currentTarget.style.transform = "translateY(-4px)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = COLOR_HAIRLINE;
+                e.currentTarget.style.transform = "translateY(0)";
+              }}
+            >
+              <div
+                style={{
+                  display: "inline-block",
+                  backgroundColor: COLOR_VOLT,
+                  padding: "6px 12px",
+                  borderRadius: 2,
+                  fontFamily: "var(--font-inter), sans-serif",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  color: COLOR_ASPHALT,
+                  marginBottom: 16,
+                }}
+              >
+                {item.label}
+              </div>
+              <h3
                 style={{
                   fontFamily: "var(--font-space-grotesk), sans-serif",
-                  fontSize: 32,
+                  fontSize: 20,
                   fontWeight: 700,
                   color: COLOR_ASPHALT,
                   marginBottom: 12,
                 }}
               >
-                Advance Payment, Simply
-              </h2>
+                {item.title}
+              </h3>
               <p
                 style={{
                   fontFamily: "var(--font-inter), sans-serif",
-                  fontSize: 16,
+                  fontSize: 14,
                   color: COLOR_STEEL,
-                  marginBottom: 48,
+                  lineHeight: 1.7,
+                  margin: 0,
                 }}
               >
-                Reserve your ride today without the hassle.
+                {item.description}
               </p>
             </div>
-          </FadeIn>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Contact Section ─────────────────────────────────────────────── */}
+      <section
+        id="contact"
+        style={{
+          backgroundColor: COLOR_ASPHALT,
+          padding: "80px 20px",
+        }}
+      >
+        <div className="layout-container">
+          <h2
+            style={{
+              fontFamily: "var(--font-space-grotesk), sans-serif",
+              fontSize: "clamp(28px, 5vw, 48px)",
+              fontWeight: 700,
+              color: "#FFFFFF",
+              marginBottom: 20,
+              textAlign: "center",
+            }}
+          >
+            Get in Touch
+          </h2>
+          <p
+            style={{
+              fontFamily: "var(--font-inter), sans-serif",
+              fontSize: "clamp(15px, 2vw, 18px)",
+              color: COLOR_STEEL,
+              maxWidth: "600px",
+              margin: "0 auto 48px",
+              textAlign: "center",
+            }}
+          >
+            Questions about our bikes? Ready to book? We're here to help.
+          </p>
 
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(1, 1fr)",
-              gap: 40,
+              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+              gap: 24,
+              maxWidth: "900px",
+              margin: "0 auto",
             }}
-            className="md:grid-cols-3"
           >
             {[
               {
-                step: "1. Reserve",
-                title: "Pay a small advance",
-                desc: "A fully refundable ₹2,000 advance secures your booking instantly.",
+                label: "Phone",
+                value: "+91 73581 10762",
+                href: "tel:+917358110762",
+                note: "Mon–Sat, 9 AM – 6 PM IST",
               },
               {
-                step: "2. Confirm",
-                title: "We call you",
-                desc: "Our team contacts you within 24 hours to confirm colour and delivery slot.",
+                label: "Email",
+                value: "hello@semy.in",
+                href: "mailto:hello@semy.in",
+                note: "We'll respond within 24 hours",
               },
               {
-                step: "3. Complete",
-                title: "Pay on delivery",
-                desc: "The remaining balance is collected in cash or UPI when your bike arrives.",
+                label: "WhatsApp",
+                value: "Message Us ↗",
+                href: "https://wa.me/917358110762",
+                note: "Quick replies during business hours",
+                external: true,
               },
-            ].map((item, i) => (
-              <FadeIn key={i} delay={i * 100}>
+            ].map((contact) => (
+              <a
+                key={contact.label}
+                href={contact.href}
+                target={contact.external ? "_blank" : undefined}
+                rel={contact.external ? "noopener noreferrer" : undefined}
+                style={{
+                  backgroundColor: "rgba(255,255,255,0.05)",
+                  border: `1px solid rgba(255,255,255,0.1)`,
+                  borderRadius: 2,
+                  padding: 32,
+                  textDecoration: "none",
+                  display: "block",
+                  transition: "border-color 150ms ease, background-color 150ms ease, transform 150ms ease",
+                  minHeight: "44px",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = COLOR_VOLT;
+                  e.currentTarget.style.backgroundColor = "rgba(200,241,53,0.05)";
+                  e.currentTarget.style.transform = "translateY(-4px)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)";
+                  e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.05)";
+                  e.currentTarget.style.transform = "translateY(0)";
+                }}
+              >
                 <div
                   style={{
-                    display: "flex",
-                    flexDirection: "column",
+                    fontFamily: "var(--font-inter), sans-serif",
+                    fontSize: 11,
+                    fontWeight: 700,
+                    letterSpacing: "0.08em",
+                    textTransform: "uppercase",
+                    color: COLOR_VOLT,
+                    marginBottom: 12,
                   }}
                 >
-                  <span
-                    style={{
-                      fontFamily: "var(--font-inter), sans-serif",
-                      fontSize: 12,
-                      fontWeight: 600,
-                      letterSpacing: "0.08em",
-                      textTransform: "uppercase",
-                      color: COLOR_VOLT,
-                      marginBottom: 12,
-                      display: "inline-block",
-                      padding: "4px 8px",
-                      backgroundColor: COLOR_ASPHALT,
-                      alignSelf: "flex-start",
-                      borderRadius: 2,
-                    }}
-                  >
-                    {item.step}
-                  </span>
-                  <h3
-                    style={{
-                      fontFamily: "var(--font-space-grotesk), sans-serif",
-                      fontSize: 20,
-                      fontWeight: 700,
-                      color: COLOR_ASPHALT,
-                      marginBottom: 10,
-                    }}
-                  >
-                    {item.title}
-                  </h3>
-                  <p
-                    style={{
-                      fontFamily: "var(--font-inter), sans-serif",
-                      fontSize: 15,
-                      lineHeight: 1.6,
-                      color: COLOR_STEEL,
-                      margin: 0,
-                    }}
-                  >
-                    {item.desc}
-                  </p>
+                  {contact.label}
                 </div>
-              </FadeIn>
+                <div
+                  style={{
+                    fontFamily: "var(--font-space-grotesk), sans-serif",
+                    fontSize: 20,
+                    fontWeight: 700,
+                    color: COLOR_PAPER,
+                    marginBottom: 8,
+                  }}
+                >
+                  {contact.value}
+                </div>
+                <div
+                  style={{
+                    fontFamily: "var(--font-inter), sans-serif",
+                    fontSize: 14,
+                    color: COLOR_STEEL,
+                  }}
+                >
+                  {contact.note}
+                </div>
+              </a>
             ))}
           </div>
         </div>

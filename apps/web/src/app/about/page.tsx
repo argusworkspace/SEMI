@@ -1,33 +1,31 @@
-import { Metadata } from "next";
-import FadeIn from "@/modules/shared/components/FadeIn";
-import { COLOR_ASPHALT, COLOR_PAPER, COLOR_STEEL, COLOR_HAIRLINE } from "@/lib/design-tokens";
-
-export const metadata: Metadata = {
-  title: "About SEMY",
-  description: "Our company was founded with the primary goal of becoming a trusted partner in the field of design and technology.",
-};
+import {
+  COLOR_PAPER,
+  COLOR_ASPHALT,
+  COLOR_STEEL,
+  COLOR_VOLT,
+  COLOR_HAIRLINE,
+} from "@/lib/design-tokens";
 
 export default function AboutPage() {
   return (
-    <div style={{ backgroundColor: COLOR_PAPER, paddingBottom: 120 }}>
-      {/* ── 1. Page Header & Intro ─────────────────────────────────────────── */}
+    <div style={{ backgroundColor: COLOR_PAPER }}>
+      {/* Hero section */}
       <section
         style={{
-          paddingTop: 80,
-          paddingBottom: 64,
-          borderBottom: `1px solid ${COLOR_HAIRLINE}`,
+          backgroundColor: COLOR_ASPHALT,
+          padding: "80px 20px 60px",
+          textAlign: "center",
         }}
-        className="layout-container text-center"
       >
-        <FadeIn>
+        <div style={{ maxWidth: "800px", margin: "0 auto" }}>
           <h1
             style={{
               fontFamily: "var(--font-space-grotesk), sans-serif",
-              fontSize: 44,
-              lineHeight: 1.2,
+              fontSize: "clamp(32px, 5vw, 48px)",
               fontWeight: 700,
-              color: COLOR_ASPHALT,
-              marginBottom: 32,
+              color: "#FFFFFF",
+              marginBottom: 20,
+              lineHeight: 1.2,
             }}
           >
             About SEMY
@@ -35,110 +33,253 @@ export default function AboutPage() {
           <p
             style={{
               fontFamily: "var(--font-inter), sans-serif",
-              fontSize: 18,
-              lineHeight: 1.6,
+              fontSize: "clamp(15px, 2vw, 18px)",
               color: COLOR_STEEL,
-              maxWidth: 800,
-              marginInline: "auto",
+              maxWidth: "600px",
+              margin: "0 auto",
+              lineHeight: 1.6,
             }}
-            className="text-balance"
           >
-            Our company was founded with the primary goal of becoming a trusted
-            partner in the field of design and technology. We manufacture bicycles,
-            e-cycles especially for in-campus drives for MNCs. We make sure the
-            quality of each product we make and the customer satisfaction is our
-            utmost priority than anything. We make the urban mobility easy, green
-            and clean with our products.
+            Reimagining urban mobility for India, one electric bike at a time.
           </p>
-        </FadeIn>
+        </div>
       </section>
 
-      {/* ── 2. Mission & Vision (Spec-sheet Layout) ────────────────────────── */}
-      <section
-        className="layout-container"
-        style={{ paddingTop: 64 }}
-      >
-        <div
-          style={{
-            display: "grid",
-            gap: 48,
-          }}
-          className="md:grid-cols-2"
-        >
-          {/* Mission Column */}
-          <FadeIn delay={100}>
-            <div
-              style={{
-                borderTop: `1px solid ${COLOR_HAIRLINE}`,
-                paddingTop: 32,
-              }}
-            >
-              <h2
-                style={{
-                  fontFamily: "var(--font-space-grotesk), sans-serif",
-                  fontSize: 24,
-                  fontWeight: 700,
-                  color: COLOR_ASPHALT,
-                  marginBottom: 16,
-                }}
-              >
-                Our Mission
-              </h2>
-              <p
-                style={{
-                  fontFamily: "var(--font-inter), sans-serif",
-                  fontSize: 16,
-                  lineHeight: 1.6,
-                  color: COLOR_STEEL,
-                  margin: 0,
-                }}
-              >
-                At SEMY, our mission is to empower communities with innovative electric &amp; 
-                pedal-powered cycles that offer safe, smart, and sustainable mobility solutions, 
-                especially designed for campus and short-distance travel. We aim to make eco-friendly 
-                transport accessible, affordable, and enjoyable for everyone
-              </p>
-            </div>
-          </FadeIn>
+      {/* Content sections */}
+      <section className="layout-container" style={{ paddingTop: 64, paddingBottom: 64 }}>
+        {/* Our Story */}
+        <div style={{ marginBottom: 64 }}>
+          <h2
+            style={{
+              fontFamily: "var(--font-space-grotesk), sans-serif",
+              fontSize: 28,
+              fontWeight: 700,
+              color: COLOR_ASPHALT,
+              marginBottom: 16,
+            }}
+          >
+            Our Story
+          </h2>
+          <div
+            style={{
+              fontFamily: "var(--font-inter), sans-serif",
+              fontSize: 16,
+              color: COLOR_STEEL,
+              lineHeight: 1.8,
+              maxWidth: "800px",
+            }}
+          >
+            <p style={{ marginBottom: 20 }}>
+              SEMY was born from a simple observation: India's urban commuters
+              needed a better way to navigate crowded streets. Traditional
+              petrol bikes were expensive to run and maintain, while existing
+              electric options either lacked power or broke the bank.
+            </p>
+            <p style={{ marginBottom: 20 }}>
+              We set out to build electric bikes that could handle real Indian
+              conditions — potholed roads, steep inclines, monsoon weather, and
+              daily 40km commutes. Bikes that didn't compromise on performance,
+              reliability, or affordability.
+            </p>
+            <p style={{ margin: 0 }}>
+              Today, SEMY bikes are helping thousands of riders across the
+              country save money, reduce emissions, and reclaim time lost in
+              traffic. We're just getting started.
+            </p>
+          </div>
+        </div>
 
-          {/* Vision Column */}
-          <FadeIn delay={200}>
+        {/* Mission & Vision */}
+        <div style={{ marginBottom: 64 }}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+              gap: 32,
+            }}
+          >
+            {/* Mission */}
             <div
               style={{
-                borderTop: `1px solid ${COLOR_HAIRLINE}`,
-                paddingTop: 32,
+                backgroundColor: "#FFFFFF",
+                border: `1px solid ${COLOR_HAIRLINE}`,
+                borderRadius: 2,
+                padding: 32,
               }}
             >
-              <h2
+              <div
                 style={{
-                  fontFamily: "var(--font-space-grotesk), sans-serif",
-                  fontSize: 24,
+                  display: "inline-block",
+                  backgroundColor: COLOR_VOLT,
+                  padding: "6px 12px",
+                  borderRadius: 2,
+                  fontFamily: "var(--font-inter), sans-serif",
+                  fontSize: 11,
                   fontWeight: 700,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
                   color: COLOR_ASPHALT,
                   marginBottom: 16,
                 }}
               >
-                Our Vision
-              </h2>
+                Mission
+              </div>
+              <h3
+                style={{
+                  fontFamily: "var(--font-space-grotesk), sans-serif",
+                  fontSize: 22,
+                  fontWeight: 700,
+                  color: COLOR_ASPHALT,
+                  marginBottom: 12,
+                }}
+              >
+                Accessible Electric Mobility
+              </h3>
               <p
                 style={{
                   fontFamily: "var(--font-inter), sans-serif",
-                  fontSize: 16,
-                  lineHeight: 1.6,
+                  fontSize: 15,
                   color: COLOR_STEEL,
+                  lineHeight: 1.7,
                   margin: 0,
                 }}
               >
-                Our vision is to lead the future of sustainable urban commuting, shaping a world 
-                where mobility is smarter, cleaner, and more connected than ever before. We aim to 
-                redefine how campuses and cities move, replacing outdated, polluting transport with 
-                innovative, people-friendly solutions. Every journey should be seamless, efficient, 
-                and eco-conscious fostering healthier communities and a greener planet. At SEMY, we 
-                believe in transforming urban mobility, one smart, efficient, and environmentally 
-                responsible ride at a time.
+                Make electric two-wheelers affordable, reliable, and practical
+                for every Indian commuter. No compromises on quality,
+                performance, or service.
               </p>
             </div>
-          </FadeIn>
+
+            {/* Vision */}
+            <div
+              style={{
+                backgroundColor: "#FFFFFF",
+                border: `1px solid ${COLOR_HAIRLINE}`,
+                borderRadius: 2,
+                padding: 32,
+              }}
+            >
+              <div
+                style={{
+                  display: "inline-block",
+                  backgroundColor: COLOR_VOLT,
+                  padding: "6px 12px",
+                  borderRadius: 2,
+                  fontFamily: "var(--font-inter), sans-serif",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  color: COLOR_ASPHALT,
+                  marginBottom: 16,
+                }}
+              >
+                Vision
+              </div>
+              <h3
+                style={{
+                  fontFamily: "var(--font-space-grotesk), sans-serif",
+                  fontSize: 22,
+                  fontWeight: 700,
+                  color: COLOR_ASPHALT,
+                  marginBottom: 12,
+                }}
+              >
+                Cleaner, Smarter Cities
+              </h3>
+              <p
+                style={{
+                  fontFamily: "var(--font-inter), sans-serif",
+                  fontSize: 15,
+                  color: COLOR_STEEL,
+                  lineHeight: 1.7,
+                  margin: 0,
+                }}
+              >
+                Lead India's transition to sustainable urban transport. Reduce
+                emissions, cut commute costs, and prove that electric can be
+                better than petrol — not just greener.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Our Values */}
+        <div>
+          <h2
+            style={{
+              fontFamily: "var(--font-space-grotesk), sans-serif",
+              fontSize: 28,
+              fontWeight: 700,
+              color: COLOR_ASPHALT,
+              marginBottom: 24,
+            }}
+          >
+            Our Values
+          </h2>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+              gap: 24,
+            }}
+          >
+            {[
+              {
+                title: "Built to Last",
+                description:
+                  "We design for durability, not disposability. Every bike is tested to handle years of daily use.",
+              },
+              {
+                title: "Honest Pricing",
+                description:
+                  "No hidden costs, no markup games. Fair prices backed by transparent service and warranty terms.",
+              },
+              {
+                title: "Customer First",
+                description:
+                  "From booking to delivery to after-sales support, we're here when you need us.",
+              },
+              {
+                title: "Made in India",
+                description:
+                  "Designed, engineered, and manufactured locally. Supporting Indian jobs and innovation.",
+              },
+            ].map((value) => (
+              <div
+                key={value.title}
+                style={{
+                  backgroundColor: "#FFFFFF",
+                  border: `1px solid ${COLOR_HAIRLINE}`,
+                  borderRadius: 2,
+                  padding: 24,
+                }}
+              >
+                <h3
+                  style={{
+                    fontFamily: "var(--font-space-grotesk), sans-serif",
+                    fontSize: 18,
+                    fontWeight: 700,
+                    color: COLOR_ASPHALT,
+                    marginBottom: 10,
+                  }}
+                >
+                  {value.title}
+                </h3>
+                <p
+                  style={{
+                    fontFamily: "var(--font-inter), sans-serif",
+                    fontSize: 14,
+                    color: COLOR_STEEL,
+                    lineHeight: 1.6,
+                    margin: 0,
+                  }}
+                >
+                  {value.description}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     </div>

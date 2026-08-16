@@ -9,6 +9,7 @@ from src.core.database import Base
 
 # Import all models so Alembic can detect them
 import src.modules.users.models  # noqa: F401
+import src.modules.orders.models  # noqa: F401
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.database_url)

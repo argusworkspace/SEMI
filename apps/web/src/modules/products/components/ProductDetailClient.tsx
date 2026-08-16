@@ -137,7 +137,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
         }
       `}</style>
 
-      <div className="layout-container" style={{ paddingTop: 24, paddingBottom: 56 }}>
+      <div className="layout-container page-top-offset" style={{ paddingBottom: 56 }}>
         {/* Breadcrumb */}
         <nav aria-label="Breadcrumb" style={{ marginBottom: 20 }}>
           <ol style={{ display: "flex", alignItems: "center", gap: 6, listStyle: "none", padding: 0, margin: 0, fontSize: 12, fontFamily: "var(--font-inter), sans-serif", color: "#8896A5", flexWrap: "wrap" }}>

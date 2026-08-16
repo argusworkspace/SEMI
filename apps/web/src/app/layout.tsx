@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/modules/shared/components/Header";
@@ -19,10 +19,15 @@ const inter = Inter({
   display: "swap",
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
 export const metadata: Metadata = {
   title: "SEMY — Urban Electric Mobility",
   description: "SEMY electric bikes — built for India's roads. Book with just ₹5,000 advance.",
-  viewport: "width=device-width, initial-scale=1, viewport-fit=cover",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

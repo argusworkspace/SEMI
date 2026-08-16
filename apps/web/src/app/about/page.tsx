@@ -38,9 +38,12 @@ export default function AboutPage() {
       <div style={{ backgroundColor: "#F7F3EE", paddingBottom: 64 }}>
         {/* Hero */}
         <section
+          className="page-top-offset"
           style={{
             backgroundColor: "#0F1B2D",
-            padding: "64px 16px",
+            paddingLeft: 16,
+            paddingRight: 16,
+            paddingBottom: 48,
             textAlign: "center",
           }}
         >
@@ -121,7 +124,7 @@ export default function AboutPage() {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+                gridTemplateColumns: "repeat(auto-fit, minmax(min(280px, 100%), 1fr))",
                 gap: 20,
               }}
             >
@@ -198,7 +201,7 @@ export default function AboutPage() {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+                gridTemplateColumns: "repeat(auto-fit, minmax(min(240px, 100%), 1fr))",
                 gap: 20,
               }}
             >

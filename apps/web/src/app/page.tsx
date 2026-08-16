@@ -3,14 +3,29 @@
 import { useEffect, useRef, useState } from "react";
 import ProductCard from "@/modules/products/components/ProductCard";
 import AchievementsStrip from "@/modules/shared/components/AchievementsStrip";
+import HeroBackground from "@/modules/shared/components/HeroBackground";
 import { MOCK_PRODUCTS } from "@/lib/mock-products";
 import { COLOR_ASPHALT, COLOR_VOLT, COLOR_PAPER, COLOR_STEEL, COLOR_HAIRLINE } from "@/lib/design-tokens";
 
+// TODO: confirm exact event name/date with client before shipping Card 1 caption.
 const ACHIEVEMENTS = [
-  { value: "500+", label: "Bikes Delivered" },
-  { value: "50+", label: "Campus Drives Completed" },
-  { value: "25+", label: "Cities Served" },
-  { value: "98%", label: "Customer Satisfaction" },
+  {
+    image: "/images/acheivements/dignitary-meet.jpeg",
+    title: "Appreciated by the Vice President of India",
+    // TODO: confirm wording with client — placeholder, do not ship without sign-off
+    caption:
+      "SEMY was appreciated by Shri C.P. Radhakrishnan, Vice President of India.",
+  },
+  {
+    image: "/images/acheivements/sunset-ride.jpeg",
+    title: "Built for the Open Road",
+    caption: "A SEMY out on an evening ride — real rides, real roads.",
+  },
+  {
+    image: "/images/acheivements/happy-rider.jpeg",
+    title: "Riders Love It",
+    caption: "One of our riders with his SEMY — built tough, ridden daily.",
+  },
 ];
 
 export default function Home() {
@@ -113,7 +128,6 @@ export default function Home() {
       <section
         id="home"
         style={{
-          backgroundColor: "#0F1B2D",
           minHeight: "55vh",
           display: "flex",
           alignItems: "center",
@@ -124,19 +138,40 @@ export default function Home() {
         }}
         className="hero-section"
       >
+        {/* Layer 1 — static poster: always rendered, this is what mobile shows */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/hero-poster.jpg"
+          alt=""
+          aria-hidden="true"
+          style={{
+            position: "absolute", inset: 0,
+            width: "100%", height: "100%",
+            objectFit: "cover",
+            zIndex: 0,
+          }}
+        />
+
+        {/* Layer 2 — video: mounts only on desktop (≥768px), zero bytes on mobile */}
+        <HeroBackground />
+
+        {/* Layer 3 — dark overlay for text contrast */}
         <div
           aria-hidden="true"
           style={{
             position: "absolute", inset: 0,
-            backgroundImage: `linear-gradient(rgba(212,168,67,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(212,168,67,0.05) 1px, transparent 1px)`,
-            backgroundSize: "40px 40px", pointerEvents: "none",
+            backgroundColor: "rgba(15, 27, 45, 0.70)",
+            zIndex: 1,
+            pointerEvents: "none",
           }}
         />
+
+        {/* Content */}
         <div
           className="anim-fade-up visible"
           style={{
             maxWidth: "1200px", width: "100%", textAlign: "center",
-            position: "relative", zIndex: 1,
+            position: "relative", zIndex: 10,
           }}
         >
           <h1
@@ -169,8 +204,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Achievements ──────────────────────────────────────────────────── */}
-      <AchievementsStrip achievements={ACHIEVEMENTS} />
 
       {/* ── Products ──────────────────────────────────────────────────────── */}
       <section id="products" className="layout-container" style={{ paddingTop: 64, paddingBottom: 64 }}>
@@ -216,6 +249,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* ── Achievements ──────────────────────────────────────────────────── */}
+      <AchievementsStrip achievements={ACHIEVEMENTS} />
 
       {/* ── About ─────────────────────────────────────────────────────────── */}
       <section id="about" className="layout-container" style={{ paddingTop: 64, paddingBottom: 64 }}>

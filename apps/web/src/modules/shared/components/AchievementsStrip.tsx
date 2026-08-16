@@ -1,16 +1,12 @@
-import {
-  COLOR_VOLT,
-  COLOR_STEEL,
-  COLOR_HAIRLINE,
-} from "@/lib/design-tokens";
-
-interface Achievement {
-  value: string;
-  label: string;
+interface AchievementCard {
+  /** Absolute-from-public path, e.g. "/images/acheivements/dignitary-meet.jpeg" */
+  image: string;
+  title: string;
+  caption: string;
 }
 
 interface AchievementsStripProps {
-  achievements: Achievement[];
+  achievements: AchievementCard[];
 }
 
 export default function AchievementsStrip({ achievements }: AchievementsStripProps) {
@@ -21,8 +17,7 @@ export default function AchievementsStrip({ achievements }: AchievementsStripPro
           background: #FFFFFF;
           border: 1.5px solid #E2DDD6;
           border-radius: 8px;
-          padding: 32px 24px;
-          text-align: center;
+          overflow: hidden;
           transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
           box-shadow: 0 2px 8px rgba(15,27,45,0.04);
         }
@@ -30,6 +25,15 @@ export default function AchievementsStrip({ achievements }: AchievementsStripPro
           transform: translateY(-4px);
           border-color: #D4A843;
           box-shadow: 0 8px 24px rgba(15,27,45,0.08);
+        }
+        .achievements-card-img {
+          width: 100%;
+          aspect-ratio: 4 / 3;
+          object-fit: cover;
+          display: block;
+        }
+        .achievements-card-body {
+          padding: 20px 20px 24px;
         }
       `}</style>
       <section
@@ -41,39 +45,44 @@ export default function AchievementsStrip({ achievements }: AchievementsStripPro
         }}
       >
         <div
-          className="layout-container achievements-scroll"
+          className="layout-container"
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-            gap: 16,
+            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+            gap: 24,
           }}
         >
-          {achievements.map((achievement, index) => (
+          {achievements.map((card, index) => (
             <div key={index} className="achievements-card">
-              <div
-                style={{
-                  fontFamily: "var(--font-space-grotesk), sans-serif",
-                  fontSize: "clamp(32px, 5vw, 48px)",
-                  fontWeight: 700,
-                  color: "#0F1B2D",
-                  lineHeight: 1.1,
-                  marginBottom: 8,
-                }}
-              >
-                {achievement.value}
-              </div>
-              <div
-                style={{
-                  fontFamily: "var(--font-inter), sans-serif",
-                  fontSize: 13,
-                  fontWeight: 600,
-                  letterSpacing: "0.02em",
-                  color: "#8896A5",
-                  lineHeight: 1.4,
-                  textTransform: "uppercase",
-                }}
-              >
-                {achievement.label}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={card.image}
+                alt={card.title}
+                className="achievements-card-img"
+              />
+              <div className="achievements-card-body">
+                <div
+                  style={{
+                    fontFamily: "var(--font-space-grotesk), sans-serif",
+                    fontSize: 17,
+                    fontWeight: 700,
+                    color: "#0F1B2D",
+                    lineHeight: 1.3,
+                    marginBottom: 8,
+                  }}
+                >
+                  {card.title}
+                </div>
+                <div
+                  style={{
+                    fontFamily: "var(--font-inter), sans-serif",
+                    fontSize: 13,
+                    color: "#8896A5",
+                    lineHeight: 1.6,
+                  }}
+                >
+                  {card.caption}
+                </div>
               </div>
             </div>
           ))}
@@ -82,3 +91,4 @@ export default function AchievementsStrip({ achievements }: AchievementsStripPro
     </>
   );
 }
+

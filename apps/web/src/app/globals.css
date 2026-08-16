@@ -264,3 +264,75 @@ button, a, [role="button"] { min-height: 44px; }
     flex: 0 0 200px;
   }
 }
+
+/* ── Mobile: safe-area insets (notch / home-bar support) ────────────────────── */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .layout-container {
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
+
+  footer {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* ── Mobile: hero section ───────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  /* The hero section now fills 100svh inline, so no override needed */
+  .hero-section {
+    min-height: 100svh;
+  }
+}
+
+/* ── Fixed-header page offset ───────────────────────────────────────────────── */
+/* Apply to the first section of any page that is NOT the home hero */
+.page-top-offset {
+  padding-top: calc(56px + 24px) !important; /* desktop header + breathing room */
+}
+
+@media (max-width: 767px) {
+  .page-top-offset {
+    padding-top: calc(44px + 20px) !important; /* mobile header + breathing room */
+  }
+}
+
+/* ── Mobile: footer top margin reduction ────────────────────────────────────── */
+@media (max-width: 640px) {
+  footer .layout-container > span:first-child {
+    margin-top: 36px;
+    margin-bottom: 32px;
+  }
+}
+
+/* ── Mobile: cart drawer full-width ─────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .cd-panel {
+    max-width: 100vw !important;
+    width: 100vw !important;
+    border-left: none !important;
+  }
+}
+
+/* ── Mobile: improve touch scrolling everywhere ─────────────────────────────── */
+@media (max-width: 767px) {
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Disable hover transforms on touch devices to avoid sticky hover states */
+  @media (hover: none) {
+    .pc-root:hover,
+    .mfg-card:hover,
+    .about-card:hover,
+    .contact-card:hover,
+    .achievements-card:hover {
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    .card-hover:hover {
+      transform: none !important;
+    }
+  }
+}

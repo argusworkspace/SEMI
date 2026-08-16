@@ -7,9 +7,8 @@ import { COLOR_PAPER } from "@/lib/design-tokens";
 export default function ProductsPage() {
   return (
     <section
-      className="layout-container"
+      className="layout-container page-top-offset"
       style={{
-        paddingTop: 80,
         paddingBottom: 64,
         backgroundColor: COLOR_PAPER,
         minHeight: "calc(100vh - 56px)",

@@ -124,17 +124,19 @@ export default function Home() {
           box-shadow: 0 8px 24px rgba(15,27,45,0.06);
         }
       `}</style>
-      {/* ── Hero ──────────────────────────────────────────────────────────── */}
+      {/* ── Hero ────────────────────────────────────────────────────── */}
       <section
         id="home"
         style={{
-          minHeight: "55vh",
+          minHeight: "100svh",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          padding: "56px 16px",
+          padding: "0 16px",
           position: "relative",
           overflow: "hidden",
+          /* Pull the section up so it starts at the very top edge, behind the fixed header */
+          marginTop: "-56px",
         }}
         className="hero-section"
       >
@@ -206,7 +208,7 @@ export default function Home() {
 
 
       {/* ── Products ──────────────────────────────────────────────────────── */}
-      <section id="products" className="layout-container" style={{ paddingTop: 64, paddingBottom: 64 }}>
+      <section id="products" className="layout-container" style={{ paddingTop: "clamp(40px, 6vw, 64px)", paddingBottom: "clamp(40px, 6vw, 64px)" }}>
         <h2 style={{ fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: "clamp(26px, 5vw, 36px)", fontWeight: 700, marginBottom: 8, color: "#0F1B2D" }}>
           Our Bikes
         </h2>
@@ -215,7 +217,7 @@ export default function Home() {
         </p>
         <div
           ref={productGridRef} id="product-grid"
-          style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 24 }}
+          style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(300px, 100%), 1fr))", gap: 20 }}
         >
           {MOCK_PRODUCTS.map((p, index) => (
             <div key={p.id} className="product-card-wrapper anim-fade-up" data-index={index}>
@@ -226,7 +228,7 @@ export default function Home() {
       </section>
 
       {/* ── Manufacturing ─────────────────────────────────────────────────── */}
-      <section id="manufacturing" style={{ backgroundColor: "#F7F3EE", padding: "64px 16px" }}>
+      <section id="manufacturing" style={{ backgroundColor: "#F7F3EE", padding: "clamp(40px, 6vw, 64px) 16px" }}>
         <div className="layout-container">
           <h2 style={{ fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: "clamp(26px, 5vw, 42px)", fontWeight: 700, color: "#0F1B2D", marginBottom: 16, textAlign: "center" }}>
             Manufacturing Excellence
@@ -235,7 +237,7 @@ export default function Home() {
             Built with precision, tested for durability. Every SEMY bike is engineered to handle Indian road conditions.
           </p>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(280px, 100%), 1fr))", gap: 16 }}>
             {[
               { title: "Frame Welding", description: "High-strength steel frames welded using automated jigs for perfect alignment and durability." },
               { title: "Component Integration", description: "Battery, motor, and electronics integrated with strict quality checks at each stage." },
@@ -254,12 +256,12 @@ export default function Home() {
       <AchievementsStrip achievements={ACHIEVEMENTS} />
 
       {/* ── About ─────────────────────────────────────────────────────────── */}
-      <section id="about" className="layout-container" style={{ paddingTop: 64, paddingBottom: 64 }}>
+      <section id="about" className="layout-container" style={{ paddingTop: "clamp(40px, 6vw, 64px)", paddingBottom: "clamp(40px, 6vw, 64px)" }}>
         <h2 style={{ fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: "clamp(26px, 5vw, 36px)", fontWeight: 700, color: "#0F1B2D", marginBottom: 40, textAlign: "center" }}>
           About SEMY
         </h2>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 24, maxWidth: "1000px", margin: "0 auto" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(280px, 100%), 1fr))", gap: 16, maxWidth: "1000px", margin: "0 auto" }}>
           {[
             { label: "Mission", title: "Accessible Electric Mobility", description: "Make electric two-wheelers affordable, reliable, and practical for every Indian commuter." },
             { label: "Vision", title: "Cleaner, Smarter Cities", description: "Lead India's transition to sustainable urban transport through innovation and quality." },
@@ -275,7 +277,7 @@ export default function Home() {
       </section>
 
       {/* ── Contact ───────────────────────────────────────────────────────── */}
-      <section id="contact" style={{ backgroundColor: "#0F1B2D", padding: "64px 16px" }}>
+      <section id="contact" style={{ backgroundColor: "#0F1B2D", padding: "clamp(40px, 6vw, 64px) 16px" }}>
         <div className="layout-container">
           <h2 style={{ fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: "clamp(26px, 5vw, 42px)", fontWeight: 700, color: "#FFFFFF", marginBottom: 16, textAlign: "center" }}>
             Get in Touch
@@ -284,7 +286,7 @@ export default function Home() {
             Questions about our bikes? Ready to book? We&apos;re here to help.
           </p>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20, maxWidth: "1000px", margin: "0 auto" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(280px, 100%), 1fr))", gap: 16, maxWidth: "1000px", margin: "0 auto" }}>
             {[
               { label: "Phone", value: "+91 73581 10762", href: "tel:+917358110762", note: "Mon–Sat, 9 AM – 6 PM IST" },
               { label: "Email", value: "hello@semy.in", href: "mailto:hello@semy.in", note: "We'll respond within 24 hours" },

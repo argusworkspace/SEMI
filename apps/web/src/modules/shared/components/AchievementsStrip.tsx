@@ -39,7 +39,7 @@ export default function AchievementsStrip({ achievements }: AchievementsStripPro
       <section
         style={{
           background: "linear-gradient(135deg, #F7F3EE 0%, #EAE4D9 100%)",
-          padding: "64px 16px",
+          padding: "clamp(40px, 6vw, 64px) 16px",
           borderTop: "1px solid #E2DDD6",
           borderBottom: "1px solid #E2DDD6",
         }}
@@ -48,8 +48,8 @@ export default function AchievementsStrip({ achievements }: AchievementsStripPro
           className="layout-container"
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-            gap: 24,
+            gridTemplateColumns: "repeat(auto-fit, minmax(min(260px, 100%), 1fr))",
+            gap: 20,
           }}
         >
           {achievements.map((card, index) => (

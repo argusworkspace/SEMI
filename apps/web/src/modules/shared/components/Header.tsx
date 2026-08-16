@@ -66,7 +66,7 @@ export default function Header() {
           background: rgba(255,255,255,0.08);
           border: 1px solid rgba(255,255,255,0.12);
           border-radius: 50%;
-          width: 36px; height: 36px; min-height: unset;
+          width: 32px; height: 32px; min-height: unset;
           display: flex; align-items: center; justify-content: center;
           cursor: pointer;
           transition: background 150ms ease, border-color 150ms ease, transform 150ms ease;
@@ -80,52 +80,72 @@ export default function Header() {
 
         .hamburger-btn {
           background: none; border: none;
-          width: 40px; height: 40px; min-height: unset;
+          width: 36px; height: 36px; min-height: unset;
           display: flex; flex-direction: column;
           align-items: center; justify-content: center;
-          gap: 5px; cursor: pointer; padding: 0;
+          gap: 4px; cursor: pointer; padding: 0;
         }
 
         .mobile-link {
           color: var(--cream-text, #EDE8E0);
           font-family: var(--font-inter), sans-serif;
-          font-size: 16px; font-weight: 500;
-          padding: 14px 0;
-          border-bottom: 1px solid rgba(255,255,255,0.07);
+          font-size: 15px; font-weight: 500;
+          padding: 11px 0;
+          border-bottom: 1px solid rgba(255,255,255,0.06);
           text-decoration: none; display: block;
           transition: color 150ms ease, padding-left 150ms ease;
         }
         .mobile-link:hover { color: var(--gold); padding-left: 6px; }
+
+        /* ── Mobile-specific header styles ── */
+        @media (max-width: 767px) {
+          .site-header {
+            /* Fully transparent at top — lets the hero show through */
+            background-color: transparent !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            border-bottom: 1px solid transparent !important;
+          }
+          .site-header.scrolled {
+            background-color: rgba(15, 27, 45, 0.82) !important;
+            backdrop-filter: blur(16px) saturate(160%) !important;
+            -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
+            border-bottom: 1px solid rgba(255,255,255,0.07) !important;
+          }
+          .header-inner {
+            height: 44px !important;
+          }
+        }
       `}</style>
 
       <header
-        className="sticky top-0 z-50 w-full"
+        className={`fixed top-0 z-50 w-full site-header${scrolled ? " scrolled" : ""}`}
         style={{
           backgroundColor: scrolled ? "rgba(15,27,45,0.98)" : "#0F1B2D",
           backdropFilter: scrolled ? "blur(12px)" : "none",
           borderBottom: `1px solid ${scrolled ? "rgba(255,255,255,0.08)" : "transparent"}`,
-          transition: "background-color 250ms ease, border-color 250ms ease",
+          transition: "background-color 250ms ease, border-color 250ms ease, backdrop-filter 250ms ease",
         }}
       >
-        <div className="layout-container flex items-center justify-between" style={{ height: 56 }}>
+        <div className="layout-container flex items-center justify-between header-inner" style={{ height: 56 }}>
           {/* Wordmark */}
-          <Link href="/" aria-label="SEMY – home" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
+          <Link href="/" aria-label="SEMY – home" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
             <span
               aria-hidden="true"
               style={{
-                width: 28, height: 28,
+                width: 24, height: 24,
                 background: "linear-gradient(135deg, #D4A843, #F0C060)",
-                borderRadius: 6,
+                borderRadius: 5,
                 display: "flex", alignItems: "center", justifyContent: "center",
                 flexShrink: 0,
                 fontFamily: "var(--font-space-grotesk), sans-serif",
-                fontSize: 13, fontWeight: 700,
+                fontSize: 12, fontWeight: 700,
                 color: "#0F1B2D",
               }}
             >
               S
             </span>
-            <span style={{ fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 20, fontWeight: 700, color: "#FFFFFF", letterSpacing: "-0.01em" }}>
+            <span style={{ fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 18, fontWeight: 700, color: "#FFFFFF", letterSpacing: "-0.01em" }}>
               SEMY
             </span>
           </Link>
@@ -136,7 +156,7 @@ export default function Header() {
               <a key={link.href} href={link.href} className="nav-link">{link.label}</a>
             ))}
             <button className="header-cart-btn" id="header-cart-btn" onClick={openDrawer} aria-label={`Cart (${totalItems})`}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EDE8E0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#EDE8E0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
               </svg>
@@ -150,13 +170,13 @@ export default function Header() {
 
           {/* Mobile controls */}
           <div className="flex md:hidden items-center gap-1">
-            <button className="header-cart-btn" id="header-cart-btn-mobile" onClick={openDrawer} aria-label={`Cart (${totalItems})`} style={{ width: 38, height: 38 }}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#EDE8E0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <button className="header-cart-btn" id="header-cart-btn-mobile" onClick={openDrawer} aria-label={`Cart (${totalItems})`}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#EDE8E0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
               </svg>
               {totalItems > 0 && (
-                <span style={{ position: "absolute", top: -4, right: -4, minWidth: 16, height: 16, borderRadius: 8, background: "var(--gold)", color: "#0F1B2D", fontSize: 9, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 3px", animation: "badgePop 0.3s ease" }}>
+                <span style={{ position: "absolute", top: -4, right: -4, minWidth: 15, height: 15, borderRadius: 8, background: "var(--gold)", color: "#0F1B2D", fontSize: 9, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 3px", animation: "badgePop 0.3s ease" }}>
                   {totalItems}
                 </span>
               )}
@@ -170,17 +190,17 @@ export default function Header() {
             >
               {[0, 1, 2].map((i) => (
                 <span key={i} style={{
-                  display: "block", width: 22, height: 2,
+                  display: "block", width: 20, height: 1.5,
                   background: "#EDE8E0", borderRadius: 2,
                   transformOrigin: "center",
                   transition: "transform 220ms ease, opacity 220ms ease, width 220ms ease",
                   transform: mobileOpen
-                    ? i === 0 ? "translateY(7px) rotate(45deg)"
-                    : i === 2 ? "translateY(-7px) rotate(-45deg)"
+                    ? i === 0 ? "translateY(5.5px) rotate(45deg)"
+                    : i === 2 ? "translateY(-5.5px) rotate(-45deg)"
                     : "none"
                     : "none",
                   opacity: mobileOpen && i === 1 ? 0 : 1,
-                  width: !mobileOpen && i === 1 ? 16 : 22,
+                  width: !mobileOpen && i === 1 ? 14 : 20,
                 }} />
               ))}
             </button>
@@ -192,15 +212,17 @@ export default function Header() {
           id="mobile-menu-panel"
           ref={menuRef}
           style={{
-            backgroundColor: "#162033",
+            backgroundColor: "rgba(15,27,45,0.92)",
+            backdropFilter: "blur(16px)",
+            WebkitBackdropFilter: "blur(16px)",
             overflow: "hidden",
-            maxHeight: mobileOpen ? "320px" : "0",
-            transition: "max-height 300ms cubic-bezier(0.4,0,0.2,1)",
+            maxHeight: mobileOpen ? "280px" : "0",
+            transition: "max-height 280ms cubic-bezier(0.4,0,0.2,1)",
             borderTop: mobileOpen ? "1px solid rgba(255,255,255,0.06)" : "none",
           }}
           className="md:hidden"
         >
-          <nav className="layout-container flex flex-col py-2">
+          <nav className="layout-container flex flex-col py-1">
             {NAV_LINKS.map((link) => (
               <a
                 key={link.href} href={link.href}
@@ -210,7 +232,7 @@ export default function Header() {
                 {link.label}
               </a>
             ))}
-            <span aria-hidden="true" style={{ display: "block", marginTop: 14, height: 3, width: 28, background: "linear-gradient(90deg, #D4A843, #F0C060)", borderRadius: 2 }} />
+            <span aria-hidden="true" style={{ display: "block", marginTop: 10, marginBottom: 12, height: 2, width: 24, background: "linear-gradient(90deg, #D4A843, #F0C060)", borderRadius: 2 }} />
           </nav>
         </div>
       </header>

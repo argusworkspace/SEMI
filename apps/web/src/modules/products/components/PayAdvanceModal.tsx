@@ -433,12 +433,25 @@ function DoneStep({ order, ocr, onClose }: { order: OrderInfo; ocr: OcrCheck; on
       )}
 
       <br />
+      <a
+        href={`/checkout/${order.orderId}`}
+        style={{
+          display: "block", width: "100%", textAlign: "center",
+          padding: "13px 20px", backgroundColor: COLOR_VOLT, color: COLOR_ASPHALT,
+          fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 15, fontWeight: 700,
+          border: "none", borderRadius: 2, cursor: "pointer", textDecoration: "none",
+          marginBottom: 10, boxSizing: "border-box",
+        }}
+      >
+        Fill Invoice Details →
+      </a>
       <button onClick={onClose} style={{
-        padding: "11px 28px", backgroundColor: COLOR_VOLT, color: COLOR_ASPHALT,
-        fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 14, fontWeight: 700,
-        border: "none", borderRadius: 2, cursor: "pointer",
+        width: "100%", padding: "11px 20px", backgroundColor: "transparent",
+        color: COLOR_ASPHALT, fontFamily: "var(--font-inter), sans-serif",
+        fontSize: 14, fontWeight: 500, border: `1px solid #E5E7EB`,
+        borderRadius: 2, cursor: "pointer",
       }}>
-        Done
+        Skip for now
       </button>
     </div>
   );

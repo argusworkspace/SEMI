@@ -170,12 +170,37 @@ function PriceRow({ label, value, note, bold, accent, muted }: {
 }
 
 // ── Step 2: Payment Instructions ──────────────────────────────────────────────
+const UPI_APPS = [
+  { id: "gpay",    name: "GPay",    bg: "#1a73e8", label: "G",  scheme: "tez://upi/pay" },
+  { id: "phonepe", name: "PhonePe", bg: "#5f259f", label: "Pe", scheme: "phonepe://pay" },
+  { id: "paytm",   name: "Paytm",   bg: "#00BAF2", label: "Pt", scheme: "paytmmp://upi/pay" },
+  { id: "upi",     name: "Any UPI", bg: "#F97316", label: "₹",  scheme: "upi://pay" },
+];
+
 function PaymentStep({
   order, advanceAmount, onNext,
 }: { order: OrderInfo; advanceAmount: number; onNext: () => void }) {
-  const upiId = "semy@ybl";
-  const upiName = "SEMY Mobility";
+  const [upiId, setUpiId] = useState("semy@ybl");
+  const [upiName, setUpiName] = useState("SEMY Mobility");
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/payments/config")
+      .then((r) => r.ok ? r.json() : null)
+      .then((cfg) => {
+        if (cfg?.upi_id) setUpiId(cfg.upi_id);
+        if (cfg?.upi_name) setUpiName(cfg.upi_name);
+      })
+      .catch(() => {});
+  }, []);
+
+  const upiParams = new URLSearchParams({
+    pa: upiId,
+    pn: upiName,
+    am: String(advanceAmount),
+    cu: "INR",
+    tn: `SEMY ${order.orderNumber}`,
+  }).toString();
 
   function copyUpi() {
     navigator.clipboard.writeText(upiId).then(() => {
@@ -187,70 +212,77 @@ function PaymentStep({
   return (
     <div>
       <p style={{ fontSize: 14, color: COLOR_STEEL, marginBottom: 20, fontFamily: "var(--font-inter), sans-serif", lineHeight: "20px" }}>
-        Pay exactly <strong style={{ color: COLOR_ASPHALT }}>{fmt(advanceAmount)}</strong> to the UPI ID below.
-        After paying, come back to upload your screenshot.
+        Tap your UPI app to pay exactly{" "}
+        <strong style={{ color: COLOR_ASPHALT }}>{fmt(advanceAmount)}</strong>.
+        After paying, upload your payment screenshot to confirm.
       </p>
 
-      {/* UPI details card */}
-      <div style={{ border: `1px solid ${COLOR_HAIRLINE}`, borderRadius: 2, overflow: "hidden", marginBottom: 20 }}>
-        <div style={{ backgroundColor: COLOR_ASPHALT, padding: "10px 14px" }}>
-          <span style={{ color: COLOR_VOLT, fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", fontFamily: "var(--font-inter), sans-serif" }}>
-            UPI Payment Details
-          </span>
-        </div>
-        <div style={{ padding: "16px 14px" }}>
-          <div style={{ marginBottom: 12 }}>
-            <span style={{ fontSize: 11, color: COLOR_STEEL, display: "block", marginBottom: 4, fontFamily: "var(--font-inter), sans-serif", textTransform: "uppercase", letterSpacing: "0.08em" }}>Pay To</span>
-            <span style={{ fontSize: 16, fontWeight: 700, color: COLOR_ASPHALT, fontFamily: "var(--font-space-grotesk), sans-serif" }}>{upiName}</span>
-          </div>
-          <div style={{ marginBottom: 12 }}>
-            <span style={{ fontSize: 11, color: COLOR_STEEL, display: "block", marginBottom: 4, fontFamily: "var(--font-inter), sans-serif", textTransform: "uppercase", letterSpacing: "0.08em" }}>UPI ID</span>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{ fontSize: 15, fontWeight: 600, color: COLOR_ASPHALT, fontFamily: "var(--font-space-grotesk), sans-serif" }}>{upiId}</span>
-              <button onClick={copyUpi} style={{
-                padding: "4px 10px", fontSize: 11, fontWeight: 600,
-                backgroundColor: copied ? "#dcfce7" : COLOR_PAPER,
-                color: copied ? "#16a34a" : COLOR_STEEL,
-                border: `1px solid ${COLOR_HAIRLINE}`, borderRadius: 2, cursor: "pointer",
-                fontFamily: "var(--font-inter), sans-serif",
-              }}>
-                {copied ? "Copied!" : "Copy"}
-              </button>
+      {/* UPI App buttons */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 24 }}>
+        {UPI_APPS.map((app) => (
+          <a
+            key={app.id}
+            href={`${app.scheme}?${upiParams}`}
+            style={{ textDecoration: "none", textAlign: "center" }}
+          >
+            <div style={{
+              width: "100%", aspectRatio: "1 / 1", borderRadius: 16,
+              backgroundColor: app.bg,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              marginBottom: 6, fontSize: 20, fontWeight: 700, color: "#fff",
+              fontFamily: "var(--font-space-grotesk), sans-serif",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
+            }}>
+              {app.label}
             </div>
-          </div>
-          <div>
-            <span style={{ fontSize: 11, color: COLOR_STEEL, display: "block", marginBottom: 4, fontFamily: "var(--font-inter), sans-serif", textTransform: "uppercase", letterSpacing: "0.08em" }}>Amount</span>
-            <span style={{ fontSize: 20, fontWeight: 700, color: "#5a8a00", fontFamily: "var(--font-space-grotesk), sans-serif" }}>{fmt(advanceAmount)}</span>
-          </div>
+            <span style={{
+              fontSize: 11, color: COLOR_ASPHALT, fontWeight: 500,
+              fontFamily: "var(--font-inter), sans-serif", display: "block",
+            }}>
+              {app.name}
+            </span>
+          </a>
+        ))}
+      </div>
+
+      {/* Divider */}
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+        <div style={{ flex: 1, height: 1, backgroundColor: COLOR_HAIRLINE }} />
+        <span style={{ fontSize: 11, color: COLOR_STEEL, fontFamily: "var(--font-inter), sans-serif", textTransform: "uppercase", letterSpacing: "0.08em", whiteSpace: "nowrap" }}>
+          or pay manually
+        </span>
+        <div style={{ flex: 1, height: 1, backgroundColor: COLOR_HAIRLINE }} />
+      </div>
+
+      {/* UPI ID copy */}
+      <div style={{ border: `1px solid ${COLOR_HAIRLINE}`, borderRadius: 2, padding: "12px 14px", marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div>
+          <span style={{ fontSize: 11, color: COLOR_STEEL, display: "block", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 2, fontFamily: "var(--font-inter), sans-serif" }}>UPI ID</span>
+          <span style={{ fontSize: 15, fontWeight: 600, color: COLOR_ASPHALT, fontFamily: "var(--font-space-grotesk), sans-serif" }}>{upiId}</span>
         </div>
+        <button onClick={copyUpi} style={{
+          padding: "6px 14px", fontSize: 12, fontWeight: 600,
+          backgroundColor: copied ? "#dcfce7" : COLOR_PAPER,
+          color: copied ? "#16a34a" : COLOR_STEEL,
+          border: `1px solid ${COLOR_HAIRLINE}`, borderRadius: 2, cursor: "pointer",
+          fontFamily: "var(--font-inter), sans-serif", flexShrink: 0,
+        }}>
+          {copied ? "Copied!" : "Copy"}
+        </button>
       </div>
 
       {/* Order ref */}
       <div style={{ padding: "8px 14px", backgroundColor: COLOR_PAPER, border: `1px solid ${COLOR_HAIRLINE}`, borderRadius: 2, marginBottom: 20 }}>
         <span style={{ fontSize: 11, color: COLOR_STEEL, fontFamily: "var(--font-inter), sans-serif" }}>
-          Order Ref: <strong style={{ color: COLOR_ASPHALT }}>{order.orderNumber}</strong>
+          Reference: <strong style={{ color: COLOR_ASPHALT }}>{order.orderNumber}</strong>
+          <span style={{ opacity: 0.6, marginLeft: 4 }}>(add in payment note)</span>
         </span>
       </div>
 
-      {/* Open UPI app button */}
-      <a
-        href={`upi://pay?pa=${upiId}&pn=${encodeURIComponent(upiName)}&am=${advanceAmount}&cu=INR&tn=${encodeURIComponent("SEMY " + order.orderNumber)}`}
-        style={{
-          display: "block", width: "100%", textAlign: "center",
-          padding: "13px 20px", backgroundColor: COLOR_VOLT, color: COLOR_ASPHALT,
-          fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 15, fontWeight: 700,
-          border: "none", borderRadius: 2, cursor: "pointer", textDecoration: "none",
-          marginBottom: 10, boxSizing: "border-box",
-        }}
-      >
-        Open UPI App
-      </a>
-
       <button onClick={onNext} style={{
-        width: "100%", padding: "11px 20px", backgroundColor: "transparent",
-        color: COLOR_ASPHALT, fontFamily: "var(--font-inter), sans-serif",
-        fontSize: 14, fontWeight: 600, border: `1px solid ${COLOR_ASPHALT}`,
-        borderRadius: 2, cursor: "pointer",
+        width: "100%", padding: "13px 20px", backgroundColor: COLOR_VOLT,
+        color: COLOR_ASPHALT, fontFamily: "var(--font-space-grotesk), sans-serif",
+        fontSize: 15, fontWeight: 700, border: "none", borderRadius: 2, cursor: "pointer",
       }}>
         I&apos;ve Paid — Upload Screenshot →
       </button>
@@ -331,13 +363,13 @@ function UploadStep({
               Click or drag your payment screenshot here
             </p>
             <p style={{ fontSize: 11, color: COLOR_STEEL, margin: "4px 0 0", opacity: 0.7, fontFamily: "var(--font-inter), sans-serif" }}>
-              JPG or PNG, max 10 MB
+              JPG, PNG or WebP, max 10 MB
             </p>
           </>
         )}
       </div>
 
-      <input ref={inputRef} type="file" accept="image/*" style={{ display: "none" }}
+      <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" style={{ display: "none" }}
         onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
 
       {preview && (

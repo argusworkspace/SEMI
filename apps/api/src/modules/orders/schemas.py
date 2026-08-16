@@ -12,7 +12,7 @@ class OrderCreate(BaseModel):
         ...,
         min_length=8,
         max_length=128,
-        description="Client-generated unique key. Resending the same key returns the existing order.",
+        description="Client-generated unique key. Same key returns the existing order.",
     )
     product_id: str
     product_name: str
@@ -33,6 +33,8 @@ class PaymentRead(BaseModel):
     currency: str
     status: PaymentStatus
     payment_session_id: str | None
+    ocr_amount_detected: bool = False
+    upi_ref: str | None = None
 
     model_config = {"from_attributes": True}
 
@@ -57,7 +59,22 @@ class OrderRead(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class OcrCheck(BaseModel):
+    amount_found: bool
+    success_keyword_found: bool
+    upi_ref: str | None
+    validated: bool
+    ocr_available: bool
+    message: str
+
+
+class ProofResponse(BaseModel):
+    order_id: uuid.UUID
+    order_number: str
+    payment_id: uuid.UUID
+    ocr: OcrCheck
+
+
 class WebhookPayload(BaseModel):
-    """Cashfree v3 webhook event shape (top-level fields we care about)."""
     type: str
     data: dict

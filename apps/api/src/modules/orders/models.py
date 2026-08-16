@@ -85,7 +85,11 @@ class Payment(BaseModel):
     raw_webhook: Mapped[str | None] = mapped_column(Text)
 
     # Manual payment proof (screenshot OCR flow)
-    screenshot_b64: Mapped[str | None] = mapped_column(Text)       # base64 encoded image
-    ocr_text: Mapped[str | None] = mapped_column(Text)             # raw OCR output
+    screenshot_b64: Mapped[str | None] = mapped_column(Text)
+    ocr_text: Mapped[str | None] = mapped_column(Text)
     ocr_amount_detected: Mapped[bool] = mapped_column(default=False, nullable=False)
-    upi_ref: Mapped[str | None] = mapped_column(String(64))        # UTR / reference from OCR
+    upi_ref: Mapped[str | None] = mapped_column(String(100))       # UTR / transaction ID
+    upi_to: Mapped[str | None] = mapped_column(String(200))        # recipient from OCR
+    upi_from: Mapped[str | None] = mapped_column(String(200))      # sender from OCR
+    upi_date: Mapped[str | None] = mapped_column(String(50))       # date string from OCR
+    upi_time: Mapped[str | None] = mapped_column(String(50))       # time string from OCR

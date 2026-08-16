@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import type { Product } from "@/types/product";
 import { createOrder, submitPaymentProof, type OcrCheck } from "@/lib/api/payments";
 import {
@@ -12,6 +13,17 @@ import {
   COLOR_VOLT,
 } from "@/lib/design-tokens";
 
+// ── Constants ─────────────────────────────────────────────────────────────────
+const INDIAN_STATES = [
+  "Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Goa","Gujarat",
+  "Haryana","Himachal Pradesh","Jharkhand","Karnataka","Kerala","Madhya Pradesh",
+  "Maharashtra","Manipur","Meghalaya","Mizoram","Nagaland","Odisha","Punjab",
+  "Rajasthan","Sikkim","Tamil Nadu","Telangana","Tripura","Uttar Pradesh",
+  "Uttarakhand","West Bengal","Andaman & Nicobar Islands","Chandigarh",
+  "Dadra & Nagar Haveli and Daman & Diu","Delhi","Jammu & Kashmir","Ladakh",
+  "Lakshadweep","Puducherry",
+];
+
 // ── Types ──────────────────────────────────────────────────────────────────────
 type Step = "details" | "payment" | "upload" | "done";
 
@@ -21,6 +33,12 @@ interface FormValues {
   phone: string;
   color: string;
   city: string;
+  // Billing address (for tax invoice)
+  address: string;
+  district: string;
+  pin: string;
+  state: string;
+  gstin: string;
 }
 
 interface FormErrors {
@@ -29,11 +47,26 @@ interface FormErrors {
   phone?: string;
   color?: string;
   city?: string;
+  address?: string;
+  district?: string;
+  pin?: string;
+  state?: string;
+  gstin?: string;
 }
 
 interface OrderInfo {
   orderId: string;
   orderNumber: string;
+}
+
+interface BillingPayload {
+  orderId: string;
+  name: string;
+  address: string;
+  district: string;
+  pin: string;
+  state: string;
+  gstin: string;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -49,6 +82,12 @@ function validate(v: FormValues, colors: string[]): FormErrors {
     e.phone = "Enter a valid 10-digit Indian mobile number";
   if (!v.color || !colors.includes(v.color)) e.color = "Select a colour";
   if (!v.city.trim()) e.city = "Delivery city is required";
+  if (!v.address.trim()) e.address = "Billing address is required";
+  if (!v.district.trim()) e.district = "District is required";
+  if (!/^\d{6}$/.test(v.pin.trim())) e.pin = "Enter a valid 6-digit PIN code";
+  if (!v.state) e.state = "Select a state";
+  if (v.gstin && !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(v.gstin))
+    e.gstin = "Invalid GSTIN format";
   return e;
 }
 
@@ -89,7 +128,7 @@ const inputStyle: React.CSSProperties = {
   width: "100%", padding: "10px 12px", fontSize: 15,
   fontFamily: "var(--font-inter), sans-serif", color: COLOR_ASPHALT,
   backgroundColor: COLOR_PAPER, border: `1px solid ${COLOR_HAIRLINE}`,
-  borderRadius: 2, outline: "none", appearance: "none",
+  borderRadius: 2, outline: "none", appearance: "none", boxSizing: "border-box",
 };
 
 function Spinner() {
@@ -180,8 +219,8 @@ const UPI_APPS = [
 function PaymentStep({
   order, advanceAmount, onNext,
 }: { order: OrderInfo; advanceAmount: number; onNext: () => void }) {
-  const [upiId, setUpiId] = useState("semy@ybl");
-  const [upiName, setUpiName] = useState("SEMY Mobility");
+  const [upiId, setUpiId] = useState("semy@indianbnk");
+  const [upiName, setUpiName] = useState("M S SEMY");
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -214,7 +253,7 @@ function PaymentStep({
       <p style={{ fontSize: 14, color: COLOR_STEEL, marginBottom: 20, fontFamily: "var(--font-inter), sans-serif", lineHeight: "20px" }}>
         Tap your UPI app to pay exactly{" "}
         <strong style={{ color: COLOR_ASPHALT }}>{fmt(advanceAmount)}</strong>.
-        After paying, upload your payment screenshot to confirm.
+        After paying, take a screenshot and upload it in the next step.
       </p>
 
       {/* UPI App buttons */}
@@ -293,10 +332,12 @@ function PaymentStep({
 // ── Step 3: Upload screenshot ─────────────────────────────────────────────────
 function UploadStep({
   order,
+  billing,
   onDone,
 }: {
   order: OrderInfo;
-  onDone: (ocr: OcrCheck) => void;
+  billing: BillingPayload;
+  onDone: (ocr: OcrCheck, invoiceId: string | null) => void;
 }) {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -324,20 +365,50 @@ function UploadStep({
     setError(null);
 
     const result = await submitPaymentProof(order.orderId, file);
-    setUploading(false);
 
     if (!result.success || !result.ocr) {
+      setUploading(false);
       setError(result.error ?? "Upload failed. Please try again.");
       return;
     }
-    onDone(result.ocr);
+
+    // Auto-create invoice using billing data collected at Step 1
+    let invoiceId: string | null = null;
+    try {
+      const invRes = await fetch("/api/invoice/buyer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(billing),
+      });
+      if (invRes.ok) {
+        const invData = await invRes.json();
+        invoiceId = invData.invoiceId ?? null;
+      }
+    } catch {
+      // Invoice creation failed — user will see fallback link to fill form
+    }
+
+    setUploading(false);
+    onDone(result.ocr, invoiceId);
   }
 
   return (
     <form onSubmit={handleSubmit}>
-      <p style={{ fontSize: 14, color: COLOR_STEEL, marginBottom: 16, fontFamily: "var(--font-inter), sans-serif", lineHeight: "20px" }}>
-        Upload a screenshot of your UPI payment confirmation. We&apos;ll verify and activate your booking.
-      </p>
+      {/* Screenshot instructions */}
+      <div style={{ backgroundColor: "#fffbeb", border: "1px solid #fde68a", borderRadius: 4, padding: "12px 14px", marginBottom: 16 }}>
+        <p style={{ fontSize: 13, fontWeight: 700, color: "#92400e", margin: "0 0 8px", fontFamily: "var(--font-inter), sans-serif" }}>
+          How to take a valid payment screenshot:
+        </p>
+        <ol style={{ margin: 0, paddingLeft: 16, fontSize: 12, color: "#78350f", lineHeight: "20px", fontFamily: "var(--font-inter), sans-serif" }}>
+          <li>Open GPay / PhonePe / Paytm after payment</li>
+          <li>Go to <strong>Transaction History</strong> and tap the payment</li>
+          <li>Screenshot the page showing: <strong>amount paid</strong>, <strong>UPI reference / UTR number</strong>, date, time and recipient name</li>
+          <li>Upload that screenshot below</li>
+        </ol>
+        <p style={{ margin: "8px 0 0", fontSize: 11, color: "#92400e", fontFamily: "var(--font-inter), sans-serif" }}>
+          ⚠️ Screenshots missing the UTR/transaction ID may need manual verification.
+        </p>
+      </div>
 
       {/* Drop zone */}
       <div
@@ -358,12 +429,15 @@ function UploadStep({
             style={{ maxHeight: 200, maxWidth: "100%", objectFit: "contain", borderRadius: 2 }} />
         ) : (
           <>
-            <div style={{ fontSize: 28, marginBottom: 8 }}>📸</div>
-            <p style={{ fontSize: 13, color: COLOR_STEEL, margin: 0, fontFamily: "var(--font-inter), sans-serif" }}>
-              Click or drag your payment screenshot here
+            <div style={{ fontSize: 32, marginBottom: 8 }}>📸</div>
+            <p style={{ fontSize: 14, fontWeight: 600, color: COLOR_ASPHALT, margin: "0 0 4px", fontFamily: "var(--font-inter), sans-serif" }}>
+              Tap to upload your payment screenshot
             </p>
-            <p style={{ fontSize: 11, color: COLOR_STEEL, margin: "4px 0 0", opacity: 0.7, fontFamily: "var(--font-inter), sans-serif" }}>
-              JPG, PNG or WebP, max 10 MB
+            <p style={{ fontSize: 12, color: COLOR_STEEL, margin: "0 0 4px", fontFamily: "var(--font-inter), sans-serif" }}>
+              or drag and drop here
+            </p>
+            <p style={{ fontSize: 11, color: COLOR_STEEL, margin: 0, opacity: 0.7, fontFamily: "var(--font-inter), sans-serif" }}>
+              JPG, PNG or WebP · max 10 MB
             </p>
           </>
         )}
@@ -375,7 +449,7 @@ function UploadStep({
       {preview && (
         <button type="button" onClick={() => { setFile(null); setPreview(null); }}
           style={{ fontSize: 12, color: COLOR_STEEL, background: "none", border: "none", cursor: "pointer", marginBottom: 12, fontFamily: "var(--font-inter), sans-serif" }}>
-          ✕ Remove
+          ✕ Remove and choose a different screenshot
         </button>
       )}
 
@@ -393,14 +467,24 @@ function UploadStep({
         cursor: uploading || !file ? "not-allowed" : "pointer",
         display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
       }}>
-        {uploading ? <><Spinner /> Verifying screenshot…</> : "Submit Payment Proof"}
+        {uploading ? <><Spinner /> Verifying screenshot &amp; generating invoice…</> : "Submit Payment Proof"}
       </button>
+      {!file && (
+        <p style={{ textAlign: "center", fontSize: 12, color: COLOR_STEEL, marginTop: 8, fontFamily: "var(--font-inter), sans-serif" }}>
+          Upload a screenshot first to continue
+        </p>
+      )}
     </form>
   );
 }
 
 // ── Step 4: Done ──────────────────────────────────────────────────────────────
-function DoneStep({ order, ocr, onClose }: { order: OrderInfo; ocr: OcrCheck; onClose: () => void }) {
+function DoneStep({ order, ocr, invoiceId, onClose }: {
+  order: OrderInfo;
+  ocr: OcrCheck;
+  invoiceId: string | null;
+  onClose: () => void;
+}) {
   return (
     <div style={{ textAlign: "center", padding: "8px 0 16px" }}>
       <div style={{
@@ -414,7 +498,7 @@ function DoneStep({ order, ocr, onClose }: { order: OrderInfo; ocr: OcrCheck; on
       </div>
 
       <p style={{ fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 17, fontWeight: 700, color: COLOR_ASPHALT, margin: "0 0 8px" }}>
-        {ocr.validated ? "Payment screenshot received!" : "Screenshot submitted!"}
+        {ocr.validated ? "Payment confirmed!" : "Screenshot received!"}
       </p>
       <p style={{ fontFamily: "var(--font-inter), sans-serif", fontSize: 14, color: COLOR_STEEL, margin: "0 0 16px", lineHeight: "20px" }}>
         {ocr.message}
@@ -433,12 +517,54 @@ function DoneStep({ order, ocr, onClose }: { order: OrderInfo; ocr: OcrCheck; on
       )}
 
       <br />
+
+      {invoiceId ? (
+        <>
+          <div style={{ backgroundColor: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 4, padding: "10px 14px", marginBottom: 14, textAlign: "left" }}>
+            <p style={{ fontSize: 13, fontWeight: 700, color: "#166534", margin: "0 0 4px", fontFamily: "var(--font-inter), sans-serif" }}>
+              Your tax invoice is ready!
+            </p>
+            <p style={{ fontSize: 12, color: "#16a34a", margin: 0, fontFamily: "var(--font-inter), sans-serif" }}>
+              Click below to view and download it as a PDF. Keep it for your records.
+            </p>
+          </div>
+          <a
+            href={`/invoice/${invoiceId}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "block", width: "100%", textAlign: "center",
+              padding: "13px 20px", backgroundColor: COLOR_VOLT, color: COLOR_ASPHALT,
+              fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 15, fontWeight: 700,
+              border: "none", borderRadius: 2, cursor: "pointer", textDecoration: "none",
+              marginBottom: 10, boxSizing: "border-box",
+            }}
+          >
+            View &amp; Download Tax Invoice →
+          </a>
+        </>
+      ) : (
+        <a
+          href={`/checkout/${order.orderId}`}
+          style={{
+            display: "block", width: "100%", textAlign: "center",
+            padding: "13px 20px", backgroundColor: COLOR_VOLT, color: COLOR_ASPHALT,
+            fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 15, fontWeight: 700,
+            border: "none", borderRadius: 2, cursor: "pointer", textDecoration: "none",
+            marginBottom: 10, boxSizing: "border-box",
+          }}
+        >
+          Fill Invoice Details →
+        </a>
+      )}
+
       <button onClick={onClose} style={{
-        padding: "11px 28px", backgroundColor: COLOR_VOLT, color: COLOR_ASPHALT,
-        fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 14, fontWeight: 700,
-        border: "none", borderRadius: 2, cursor: "pointer",
+        width: "100%", padding: "11px 20px", backgroundColor: "transparent",
+        color: COLOR_ASPHALT, fontFamily: "var(--font-inter), sans-serif",
+        fontSize: 14, fontWeight: 500, border: `1px solid #E5E7EB`,
+        borderRadius: 2, cursor: "pointer",
       }}>
-        Done
+        Close
       </button>
     </div>
   );
@@ -452,15 +578,18 @@ export default function PayAdvanceModal({
   product: Product;
   onClose: () => void;
 }) {
+  const router = useRouter();
   const [step, setStep] = useState<Step>("details");
   const [form, setForm] = useState<FormValues>({
     name: "", email: "", phone: "", color: product.colors[0] ?? "", city: "",
+    address: "", district: "", pin: "", state: "", gstin: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [order, setOrder] = useState<OrderInfo | null>(null);
   const [ocr, setOcr] = useState<OcrCheck | null>(null);
+  const [invoiceId, setInvoiceId] = useState<string | null>(null);
 
   const overlayRef = useRef<HTMLDivElement>(null);
   const firstInputRef = useRef<HTMLInputElement>(null);
@@ -517,6 +646,28 @@ export default function PayAdvanceModal({
     setOrder({ orderId: result.orderId, orderNumber: result.orderNumber! });
     setStep("payment");
   }
+
+  function handleUploadDone(ocrResult: OcrCheck, newInvoiceId: string | null) {
+    setOcr(ocrResult);
+    setInvoiceId(newInvoiceId);
+    if (newInvoiceId) {
+      // Invoice created — redirect directly to invoice page
+      router.push(`/invoice/${newInvoiceId}`);
+      onClose();
+    } else {
+      setStep("done");
+    }
+  }
+
+  const billing: BillingPayload | null = order ? {
+    orderId: order.orderId,
+    name: form.name.trim(),
+    address: form.address.trim(),
+    district: form.district.trim(),
+    pin: form.pin.trim(),
+    state: form.state,
+    gstin: form.gstin.trim(),
+  } : null;
 
   return (
     <>
@@ -576,6 +727,7 @@ export default function PayAdvanceModal({
             {/* ── Step 1: Details form ── */}
             {step === "details" && (
               <form onSubmit={handleDetailsSubmit} noValidate>
+                {/* Contact details */}
                 <Field id="modal-name" label="Full Name" error={errors.name}>
                   <input id="modal-name" ref={firstInputRef} type="text" autoComplete="name"
                     placeholder="e.g. Ajay Raju" value={form.name}
@@ -626,6 +778,65 @@ export default function PayAdvanceModal({
                     disabled={submitting} required />
                 </Field>
 
+                {/* ── Billing address (for tax invoice) ── */}
+                <div style={{ margin: "20px 0 16px", display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ flex: 1, height: 1, backgroundColor: COLOR_HAIRLINE }} />
+                  <span style={{ fontSize: 11, color: COLOR_STEEL, fontFamily: "var(--font-inter), sans-serif", textTransform: "uppercase", letterSpacing: "0.08em", whiteSpace: "nowrap" }}>
+                    Billing Address (for Tax Invoice)
+                  </span>
+                  <div style={{ flex: 1, height: 1, backgroundColor: COLOR_HAIRLINE }} />
+                </div>
+
+                <Field id="modal-address" label="Street / Area" error={errors.address}>
+                  <textarea
+                    id="modal-address" value={form.address}
+                    onChange={(e) => set("address", e.target.value)}
+                    placeholder="Door no., Street, Area"
+                    rows={2}
+                    style={{ ...inputStyle, borderColor: errors.address ? COLOR_AMBER : COLOR_HAIRLINE, resize: "vertical" }}
+                    disabled={submitting} required
+                  />
+                </Field>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 0 }}>
+                  <Field id="modal-district" label="District" error={errors.district}>
+                    <input id="modal-district" type="text" value={form.district}
+                      onChange={(e) => set("district", e.target.value)}
+                      placeholder="e.g. Chennai"
+                      style={{ ...inputStyle, borderColor: errors.district ? COLOR_AMBER : COLOR_HAIRLINE }}
+                      disabled={submitting} required />
+                  </Field>
+                  <Field id="modal-pin" label="PIN Code" error={errors.pin}>
+                    <input id="modal-pin" type="text" value={form.pin}
+                      onChange={(e) => set("pin", e.target.value.replace(/\D/g, "").slice(0, 6))}
+                      placeholder="6 digits" inputMode="numeric" maxLength={6}
+                      style={{ ...inputStyle, borderColor: errors.pin ? COLOR_AMBER : COLOR_HAIRLINE }}
+                      disabled={submitting} required />
+                  </Field>
+                </div>
+
+                <Field id="modal-state" label="State" error={errors.state}>
+                  <select id="modal-state" value={form.state} onChange={(e) => set("state", e.target.value)}
+                    style={{ ...inputStyle, borderColor: errors.state ? COLOR_AMBER : COLOR_HAIRLINE,
+                      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235B6470' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")`,
+                      backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center",
+                      paddingRight: 36, cursor: "pointer" }}
+                    disabled={submitting} required>
+                    <option value="">Select state</option>
+                    {INDIAN_STATES.map((s) => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
+                </Field>
+
+                <Field id="modal-gstin" label="GSTIN (optional)" error={errors.gstin}>
+                  <input id="modal-gstin" type="text" value={form.gstin}
+                    onChange={(e) => set("gstin", e.target.value.toUpperCase().slice(0, 15))}
+                    placeholder="15-character GSTIN (if applicable)"
+                    style={{ ...inputStyle, borderColor: errors.gstin ? COLOR_AMBER : COLOR_HAIRLINE }}
+                    disabled={submitting} />
+                </Field>
+
                 {submitError && (
                   <div role="alert" style={{ padding: "10px 12px", backgroundColor: "#fef2f2", border: "1px solid #fecaca", borderRadius: 2, marginBottom: 16, fontSize: 13, color: "#dc2626", fontFamily: "var(--font-inter), sans-serif" }}>
                     {submitError}
@@ -665,16 +876,17 @@ export default function PayAdvanceModal({
             )}
 
             {/* ── Step 3: Upload ── */}
-            {step === "upload" && order && (
+            {step === "upload" && order && billing && (
               <UploadStep
                 order={order}
-                onDone={(result) => { setOcr(result); setStep("done"); }}
+                billing={billing}
+                onDone={handleUploadDone}
               />
             )}
 
-            {/* ── Step 4: Done ── */}
+            {/* ── Step 4: Done (only shown when invoice creation failed) ── */}
             {step === "done" && order && ocr && (
-              <DoneStep order={order} ocr={ocr} onClose={onClose} />
+              <DoneStep order={order} ocr={ocr} invoiceId={invoiceId} onClose={onClose} />
             )}
           </div>
         </div>

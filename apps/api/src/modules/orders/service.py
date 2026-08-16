@@ -153,6 +153,10 @@ class OrderService:
         payment.ocr_text = ocr.raw_text
         payment.ocr_amount_detected = ocr.amount_found
         payment.upi_ref = ocr.upi_ref
+        payment.upi_to = ocr.upi_to
+        payment.upi_from = ocr.upi_from
+        payment.upi_date = ocr.upi_date
+        payment.upi_time = ocr.upi_time
         payment.status = PaymentStatus.UNDER_REVIEW
         self.payment_repo.db.add(payment)
 

@@ -10,6 +10,7 @@ from src.core.database import Base, _build_engine_kwargs
 # Import all models so Alembic can detect them
 import src.modules.users.models  # noqa: F401
 import src.modules.orders.models  # noqa: F401
+import src.modules.invoices.models  # noqa: F401
 
 _ek = _build_engine_kwargs(settings.database_url)
 

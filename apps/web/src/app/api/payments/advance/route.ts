@@ -1,56 +1,52 @@
-/**
- * app/api/payments/advance/route.ts — Next.js Route Handler (stub)
- *
- * TODO(backend): A real implementation of this route must:
- *
- *  1. VALIDATE payload server-side (zod or manual checks):
- *       - productId exists in the catalog
- *       - phone is a 10-digit Indian mobile number
- *       - advanceAmount matches the catalog value (never trust the client)
- *
- *  2. CREATE a Razorpay order:
- *       const razorpay = new Razorpay({ key_id, key_secret });
- *       const order = await razorpay.orders.create({
- *         amount: advanceAmount * 100,   // Razorpay uses paise
- *         currency: "INR",
- *         receipt: `SEMY-ADV-${Date.now()}`,
- *         notes: { productId, customerName, phone, city },
- *       });
- *
- *  3. PERSIST the booking in the FastAPI backend (POST /bookings):
- *       await apiClient.post("/bookings", {
- *         product_id, customer_name, phone, color, city,
- *         advance_amount, razorpay_order_id: order.id,
- *         status: "pending",
- *       });
- *
- *  4. RETURN a real payment link for Razorpay Hosted Checkout:
- *       return NextResponse.json({
- *         success: true,
- *         transactionId: order.id,
- *         paymentUrl: `https://rzp.io/l/${order.id}`,
- *       });
- *
- *  5. HANDLE the Razorpay webhook at /api/payments/webhook to mark
- *     bookings as "confirmed" after successful payment capture.
- */
-
 import { NextRequest, NextResponse } from "next/server";
+import { randomUUID } from "crypto";
+
+const API_URL = process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 export async function POST(req: NextRequest) {
-  const payload = await req.json();
+  const body = await req.json();
 
-  console.log("[advance/route] Received booking payload:", payload);
+  const {
+    idempotencyKey,
+    productId,
+    productName,
+    color,
+    unitPrice,
+    customerName,
+    email,
+    phone,
+    city,
+  } = body;
 
-  // Artificial 1-second delay to simulate network + gateway latency
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  const res = await fetch(`${API_URL}/orders`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      idempotency_key: idempotencyKey ?? randomUUID(),
+      product_id: productId,
+      product_name: productName,
+      color: color ?? null,
+      unit_price: unitPrice,
+      customer_name: customerName,
+      customer_email: email ?? `${phone}@semy.in`,
+      customer_phone: phone,
+      delivery_pincode: null,
+      notes: city ? `City: ${city}` : null,
+    }),
+  });
 
-  const transactionId =
-    "SEMY-ADV-" + Math.floor(100000 + Math.random() * 900000).toString();
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: "Gateway error" }));
+    return NextResponse.json(
+      { success: false, error: err.detail ?? "Failed to create order" },
+      { status: res.status }
+    );
+  }
 
+  const order = await res.json();
   return NextResponse.json({
     success: true,
-    transactionId,
-    paymentUrl: null,
+    orderId: order.id,
+    orderNumber: order.order_number,
   });
 }

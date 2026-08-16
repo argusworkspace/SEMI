@@ -9,7 +9,7 @@ function colorName(hex: string) {
 }
 
 export default function CartDrawer() {
-  const { items, totalItems, totalAmount, isDrawerOpen, closeDrawer, removeFromCart, updateQuantity, clearCart } = useCart();
+  const { items, totalItems, totalAmount, totalAdvance, isDrawerOpen, closeDrawer, removeFromCart, updateQuantity, clearCart } = useCart();
   const drawerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -26,8 +26,7 @@ export default function CartDrawer() {
     }
   }, [isDrawerOpen]);
 
-  const gst = Math.round(totalAmount * 0.18);
-  const grand = totalAmount + gst;
+
 
   return (
     <>
@@ -177,20 +176,16 @@ export default function CartDrawer() {
                 {/* Footer */}
                 <div style={{ borderTop: "1px solid #E2DDD6", padding: "14px 16px 18px", flexShrink: 0, background: "#FDFAF6" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
-                    <span style={{ fontFamily: "var(--font-inter), sans-serif", fontSize: 12, color: "#8896A5" }}>Subtotal</span>
+                    <span style={{ fontFamily: "var(--font-inter), sans-serif", fontSize: 12, color: "#8896A5" }}>Total Cycle Price</span>
                     <span style={{ fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 13, fontWeight: 600, color: "#162033" }}>{fmt(totalAmount)}</span>
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
-                    <span style={{ fontFamily: "var(--font-inter), sans-serif", fontSize: 12, color: "#8896A5" }}>GST (18%)</span>
-                    <span style={{ fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 13, fontWeight: 600, color: "#8896A5" }}>{fmt(gst)}</span>
                   </div>
                   <div style={{ borderTop: "1px dashed #E2DDD6", margin: "8px 0 12px" }} />
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 14 }}>
-                    <span style={{ fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 14, fontWeight: 700, color: "#0F1B2D" }}>Total</span>
-                    <span style={{ fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 22, fontWeight: 700, color: "#D4A843" }}>{fmt(grand)}</span>
+                    <span style={{ fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 14, fontWeight: 700, color: "#0F1B2D" }}>Advance Payable</span>
+                    <span style={{ fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 22, fontWeight: 700, color: "#D4A843" }}>{fmt(totalAdvance)}</span>
                   </div>
-                  <button id="cart-checkout-btn" className="cd-checkout-btn" onClick={() => alert(`Cashfree payment integration coming soon!\n\nItems: ${totalItems}\nTotal: ${fmt(grand)}`)}>
-                    Proceed to Checkout — {fmt(grand)}
+                  <button id="cart-checkout-btn" className="cd-checkout-btn" onClick={() => alert(`Cashfree payment integration coming soon!\n\nItems: ${totalItems}\nAdvance Payable: ${fmt(totalAdvance)}`)}>
+                    Proceed to Preorder — {fmt(totalAdvance)}
                   </button>
                   <button className="cd-clear-btn" onClick={clearCart}>Clear Cart</button>
                 </div>

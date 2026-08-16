@@ -49,9 +49,10 @@ export default function ProductCard({ product }: { product: Product }) {
           height: 180px;
           display: flex; align-items: center; justify-content: center;
           position: relative; overflow: hidden;
+          padding: 16px;
         }
         .pc-img {
-          max-height: 160px; object-fit: contain;
+          width: 100%; height: 100%; object-fit: contain;
           transition: transform 320ms ease;
         }
         .pc-root:hover .pc-img { transform: scale(1.05) translateY(-4px); }

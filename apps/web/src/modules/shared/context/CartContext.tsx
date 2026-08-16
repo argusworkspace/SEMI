@@ -23,6 +23,7 @@ interface CartContextValue {
   items: CartItem[];
   totalItems: number;
   totalAmount: number;
+  totalAdvance: number;
   /** Whether the cart drawer is open */
   isDrawerOpen: boolean;
   /** Incremented every time an item is added — used to trigger animations */
@@ -128,6 +129,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     (sum, i) => sum + i.product.price * i.quantity,
     0
   );
+  const totalAdvance = items.reduce(
+    (sum, i) => sum + (i.product.advanceAmount || 5000) * i.quantity,
+    0
+  );
 
   return (
     <CartContext.Provider
@@ -135,6 +140,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         items,
         totalItems,
         totalAmount,
+        totalAdvance,
         isDrawerOpen,
         addPulse,
         addToCart,

@@ -1,14 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { Space_Grotesk, Inter } from "next/font/google";
+import { Montserrat, Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/modules/shared/components/Header";
 import Footer from "@/modules/shared/components/Footer";
 import CartProviderWrapper from "@/modules/shared/components/CartProviderWrapper";
 
-const spaceGrotesk = Space_Grotesk({
+const headingFont = Montserrat({
   subsets: ["latin"],
   weight: ["500", "600", "700"],
-  variable: "--font-space-grotesk",
+  variable: "--font-space-grotesk", // retained for backward compatibility with inline styles
   display: "swap",
 });
 
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${inter.variable}`}>
+    <html lang="en" className={`${headingFont.variable} ${inter.variable}`}>
       <body
         className="antialiased flex flex-col min-h-screen"
         style={{ backgroundColor: "#F7F3EE", color: "#0F1B2D" }}

@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { PrintButton } from "./PrintButton";
 
 const API_URL =
   process.env.API_URL ??
@@ -46,6 +47,12 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "2-digit" });
 }
 
+// Extract trailing digits from an order number like "ORD-0039" → "39"
+function orderSeqNum(orderNumber: string): string {
+  const match = orderNumber?.match(/(\d+)$/);
+  return match ? String(parseInt(match[1], 10)) : (orderNumber ?? "—");
+}
+
 const td: React.CSSProperties = { border: "1px solid #000", padding: "4px 6px", fontSize: 11 };
 const tdR: React.CSSProperties = { ...td, textAlign: "right" };
 const tdC: React.CSSProperties = { ...td, textAlign: "center" };
@@ -68,15 +75,7 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
 
   return (
     <div style={{ backgroundColor: "#fff", minHeight: "100vh", padding: "20px 16px" }}>
-      {/* Print button */}
-      <div style={{ maxWidth: 800, margin: "0 auto 12px", textAlign: "right" }} className="no-print">
-        <button
-          onClick={() => window.print()}
-          style={{ padding: "8px 20px", backgroundColor: "#1c1f22", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 13, fontWeight: 600 }}
-        >
-          Print / Download PDF
-        </button>
-      </div>
+      <PrintButton />
 
       <style>{`
         @media print {
@@ -144,8 +143,9 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
                 {[
                   ["Invoice No.", inv.invoice_number],
                   ["Dated", formatDate(inv.created_at)],
+                  ["Delivery Note No.", orderSeqNum(inv.order_number)],
                   ["Mode/Terms of Payment", "UPI — Advance"],
-                  ["Buyer's Order No.", inv.order_number],
+                  ["Buyer's Order No.", orderSeqNum(inv.order_number)],
                 ].map(([label, value]) => (
                   <tr key={label}>
                     <td style={{ padding: "3px 0", color: "#555", width: "50%" }}>{label}</td>
@@ -178,7 +178,7 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
                   {inv.product_name}{inv.color ? ` — ${inv.color}` : ""}
                 </div>
                 <div style={{ fontSize: 10, color: "#555", marginTop: 2 }}>
-                  Advance against pre-order (Order: {inv.order_number})
+                  Advance against pre-order · Delivery Note No. {orderSeqNum(inv.order_number)}
                 </div>
                 {inv.upi_transaction_id && (
                   <div style={{ fontSize: 10, color: "#555" }}>

@@ -9,9 +9,10 @@ export function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const product = getProduct(params.id);
+  const { id } = await params;
+  const product = getProduct(id);
   if (!product) return { title: "Product Not Found | SEMY" };
   return {
     title: `${product.name} | SEMY Electric`,
@@ -19,12 +20,13 @@ export async function generateMetadata({
   };
 }
 
-export default function ProductDetailPage({
+export default async function ProductDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const product = getProduct(params.id);
+  const { id } = await params;
+  const product = getProduct(id);
   if (!product) notFound();
 
   return <ProductDetailClient product={product} />;

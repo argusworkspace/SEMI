@@ -213,7 +213,38 @@ export default function PayAdvanceModal({
   return (
     <>
       {/* Keyframe for spinner */}
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        @media (max-width: 640px) {
+          .modal-panel {
+            max-width: 100% !important;
+            max-height: 100vh !important;
+            height: 100vh !important;
+            border-radius: 0 !important;
+            border: none !important;
+          }
+          
+          .modal-overlay {
+            padding: 0 !important;
+          }
+          
+          .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+          }
+          
+          .modal-form-actions {
+            position: sticky;
+            bottom: 0;
+            background: #FFFFFF;
+            padding: 16px 20px !important;
+            border-top: 1px solid ${COLOR_HAIRLINE};
+            margin: 0 -20px -24px -20px;
+          }
+        }
+      `}</style>
 
       {/* Backdrop */}
       <div
@@ -233,9 +264,11 @@ export default function PayAdvanceModal({
           padding: "20px",
           backdropFilter: "blur(2px)",
         }}
+        className="modal-overlay"
       >
         {/* Panel */}
         <div
+          className="modal-panel"
           style={{
             backgroundColor: "#FFFFFF",
             width: "100%",
@@ -333,7 +366,7 @@ export default function PayAdvanceModal({
           </div>
 
           {/* ── Body ──────────────────────────────────────────────────── */}
-          <div style={{ padding: "24px 20px" }}>
+          <div className="modal-body" style={{ padding: "24px 20px" }}>
 
             {/* ── Price breakdown (ticket style) ────────────────────── */}
             <div
@@ -519,60 +552,62 @@ export default function PayAdvanceModal({
                 </Field>
 
                 {/* ── CTA ─────────────────────────────────────────── */}
-                <button
-                  id="modal-submit"
-                  type="submit"
-                  disabled={state === "loading"}
-                  style={{
-                    width: "100%",
-                    padding: "13px 20px",
-                    backgroundColor: state === "loading" ? "#a8cf2a" : COLOR_VOLT,
-                    color: COLOR_ASPHALT,
-                    fontFamily: "var(--font-space-grotesk), sans-serif",
-                    fontSize: 15,
-                    fontWeight: 700,
-                    border: "none",
-                    borderRadius: 2,
-                    cursor: state === "loading" ? "not-allowed" : "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 10,
-                    marginTop: 8,
-                    transition: "background-color 150ms ease",
-                  }}
-                >
-                  {state === "loading" ? (
-                    <>
-                      <Spinner />
-                      Processing…
-                    </>
-                  ) : (
-                    <>Confirm Advance Payment — {fmt(product.advanceAmount)}</>
-                  )}
-                </button>
+                <div className="modal-form-actions">
+                  <button
+                    id="modal-submit"
+                    type="submit"
+                    disabled={state === "loading"}
+                    style={{
+                      width: "100%",
+                      padding: "13px 20px",
+                      backgroundColor: state === "loading" ? "#a8cf2a" : COLOR_VOLT,
+                      color: COLOR_ASPHALT,
+                      fontFamily: "var(--font-space-grotesk), sans-serif",
+                      fontSize: 15,
+                      fontWeight: 700,
+                      border: "none",
+                      borderRadius: 2,
+                      cursor: state === "loading" ? "not-allowed" : "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 10,
+                      marginTop: 8,
+                      transition: "background-color 150ms ease",
+                    }}
+                  >
+                    {state === "loading" ? (
+                      <>
+                        <Spinner />
+                        Processing…
+                      </>
+                    ) : (
+                      <>Confirm Advance Payment — {fmt(product.advanceAmount)}</>
+                    )}
+                  </button>
 
-                {/* Cancel */}
-                <button
-                  type="button"
-                  onClick={() => state !== "loading" && onClose()}
-                  disabled={state === "loading"}
-                  style={{
-                    width: "100%",
-                    marginTop: 10,
-                    padding: "11px 20px",
-                    backgroundColor: "transparent",
-                    color: COLOR_STEEL,
-                    fontFamily: "var(--font-inter), sans-serif",
-                    fontSize: 14,
-                    fontWeight: 500,
-                    border: `1px solid ${COLOR_HAIRLINE}`,
-                    borderRadius: 2,
-                    cursor: state === "loading" ? "not-allowed" : "pointer",
-                  }}
-                >
-                  Cancel
-                </button>
+                  {/* Cancel */}
+                  <button
+                    type="button"
+                    onClick={() => state !== "loading" && onClose()}
+                    disabled={state === "loading"}
+                    style={{
+                      width: "100%",
+                      marginTop: 10,
+                      padding: "11px 20px",
+                      backgroundColor: "transparent",
+                      color: COLOR_STEEL,
+                      fontFamily: "var(--font-inter), sans-serif",
+                      fontSize: 14,
+                      fontWeight: 500,
+                      border: `1px solid ${COLOR_HAIRLINE}`,
+                      borderRadius: 2,
+                      cursor: state === "loading" ? "not-allowed" : "pointer",
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
               </form>
             )}
           </div>

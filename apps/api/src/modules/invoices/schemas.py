@@ -56,8 +56,27 @@ class TaxInvoiceRead(BaseModel):
     upi_time: str | None
     payment_status: str
 
+    # GST
+    hsn_code: str | None
+    taxable_value: Decimal | None
+    cgst_rate: Decimal | None
+    cgst_amount: Decimal | None
+    sgst_rate: Decimal | None
+    sgst_amount: Decimal | None
+    total_tax_amount: Decimal | None
+    round_off: Decimal | None
+
     # Seller
     seller_name: str
+    seller_trade_name: str | None
+    seller_address: str | None
+    seller_gstin: str | None
+    seller_state: str | None
+    seller_state_code: str | None
+    seller_email: str | None
     seller_upi_id: str | None
+    seller_bank_name: str | None
+    seller_bank_account: str | None
+    seller_bank_ifsc: str | None
 
     model_config = {"from_attributes": True}

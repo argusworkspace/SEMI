@@ -1,5 +1,6 @@
 import uuid
 from datetime import date
+from decimal import ROUND_HALF_UP, Decimal
 
 from fastapi import HTTPException
 
@@ -10,6 +11,27 @@ from src.modules.orders.repository import OrderRepository, PaymentRepository
 from .models import Buyer, TaxInvoice
 from .repository import InvoiceRepository
 from .schemas import BuyerCreate, TaxInvoiceRead
+
+
+def _gst_breakdown(gross: Decimal, total_gst_pct: float) -> dict:
+    """Split gross (GST-inclusive) amount into taxable + CGST + SGST."""
+    rate = Decimal(str(total_gst_pct))
+    half = rate / 2
+    divisor = 1 + rate / 100
+    taxable = (gross / divisor).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    cgst = (taxable * half / 100).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    sgst = cgst
+    total_tax = cgst + sgst
+    round_off = (gross - taxable - total_tax).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    return {
+        "taxable_value": taxable,
+        "cgst_rate": half,
+        "cgst_amount": cgst,
+        "sgst_rate": half,
+        "sgst_amount": sgst,
+        "total_tax_amount": total_tax,
+        "round_off": round_off,
+    }
 
 
 def _financial_year_prefix() -> str:
@@ -108,9 +130,22 @@ class InvoiceService:
             upi_time=payment.upi_time if payment else None,
             payment_status=payment.status.value if payment else "CREATED",
 
+            # GST
+            hsn_code=settings.product_hsn,
+            **_gst_breakdown(ADVANCE_AMOUNT, settings.gst_rate),
+
             # Seller snapshot
-            seller_name=settings.payment_upi_name,
+            seller_name=settings.seller_legal_name,
+            seller_trade_name=settings.seller_trade_name,
+            seller_address=settings.seller_address or None,
+            seller_gstin=settings.seller_gstin or None,
+            seller_state=settings.seller_state,
+            seller_state_code=settings.seller_state_code,
+            seller_email=settings.seller_email or None,
             seller_upi_id=settings.payment_upi_id,
+            seller_bank_name=settings.seller_bank_name or None,
+            seller_bank_account=settings.seller_bank_account or None,
+            seller_bank_ifsc=settings.seller_bank_ifsc or None,
 
             status="DRAFT",
         )

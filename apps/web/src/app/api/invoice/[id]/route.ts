@@ -11,10 +11,11 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-
   const res = await fetch(`${API_URL}/invoices/${id}`, { cache: "no-store" });
+
   if (!res.ok) {
     return NextResponse.json({ error: "Invoice not found" }, { status: res.status });
   }
+
   return NextResponse.json(await res.json());
 }

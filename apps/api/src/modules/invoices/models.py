@@ -89,9 +89,28 @@ class TaxInvoice(BaseModel):
     upi_time: Mapped[str | None] = mapped_column(String(50))
     payment_status: Mapped[str] = mapped_column(String(32), nullable=False)
 
+    # ── GST breakdown ──────────────────────────────────────────────────────────
+    hsn_code: Mapped[str | None] = mapped_column(String(20))
+    taxable_value: Mapped[Decimal | None] = mapped_column(Numeric(10, 2))
+    cgst_rate: Mapped[Decimal | None] = mapped_column(Numeric(5, 2))
+    cgst_amount: Mapped[Decimal | None] = mapped_column(Numeric(10, 2))
+    sgst_rate: Mapped[Decimal | None] = mapped_column(Numeric(5, 2))
+    sgst_amount: Mapped[Decimal | None] = mapped_column(Numeric(10, 2))
+    total_tax_amount: Mapped[Decimal | None] = mapped_column(Numeric(10, 2))
+    round_off: Mapped[Decimal | None] = mapped_column(Numeric(5, 2))
+
     # ── Seller (snapshot from config at invoice time) ─────────────────────────
     seller_name: Mapped[str] = mapped_column(String(200), nullable=False)
+    seller_trade_name: Mapped[str | None] = mapped_column(String(200))
+    seller_address: Mapped[str | None] = mapped_column(Text)
+    seller_gstin: Mapped[str | None] = mapped_column(String(15))
+    seller_state: Mapped[str | None] = mapped_column(String(100))
+    seller_state_code: Mapped[str | None] = mapped_column(String(5))
+    seller_email: Mapped[str | None] = mapped_column(String(256))
     seller_upi_id: Mapped[str | None] = mapped_column(String(100))
+    seller_bank_name: Mapped[str | None] = mapped_column(String(100))
+    seller_bank_account: Mapped[str | None] = mapped_column(String(30))
+    seller_bank_ifsc: Mapped[str | None] = mapped_column(String(15))
 
     # ── Invoice status ─────────────────────────────────────────────────────────
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="DRAFT")

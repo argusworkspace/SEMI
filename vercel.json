@@ -2,5 +2,23 @@
   "buildCommand": "npx turbo run build --filter=web",
   "outputDirectory": "apps/web/.next",
   "framework": "nextjs",
-  "installCommand": "npm install"
+  "installCommand": "npm install",
+  "functions": {
+    "api/index.py": {
+      "runtime": "python3.11",
+      "maxDuration": 30,
+      "memory": 1024,
+      "includeFiles": "apps/api/src/**"
+    }
+  },
+  "rewrites": [
+    { "source": "/orders/:path*", "destination": "/api/index" },
+    { "source": "/orders",        "destination": "/api/index" },
+    { "source": "/invoices/:path*","destination": "/api/index" },
+    { "source": "/invoices",      "destination": "/api/index" },
+    { "source": "/auth/:path*",   "destination": "/api/index" },
+    { "source": "/users/:path*",  "destination": "/api/index" },
+    { "source": "/webhooks/:path*","destination": "/api/index" },
+    { "source": "/health",        "destination": "/api/index" }
+  ]
 }

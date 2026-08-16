@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 
-const API_URL = process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+const API_URL =
+  process.env.API_URL ??
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ??
+  process.env.NEXT_PUBLIC_API_URL ??
+  "http://localhost:8000";
 
 export async function GET() {
   const res = await fetch(`${API_URL}/orders/config`, { next: { revalidate: 300 } });

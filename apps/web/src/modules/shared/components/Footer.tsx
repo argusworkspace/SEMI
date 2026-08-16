@@ -8,10 +8,10 @@ import {
 // Footer is a Server Component — no event handlers; hover via CSS class
 
 const QUICK_LINKS = [
-  { label: "Products",      href: "/products" },
-  { label: "Manufacturing", href: "/manufacturing" },
-  { label: "About",         href: "/about" },
-  { label: "Contact",       href: "/contact" },
+  { label: "Products",      href: "#products" },
+  { label: "Manufacturing", href: "#manufacturing" },
+  { label: "About",         href: "#about" },
+  { label: "Contact",       href: "#contact" },
 ];
 
 const CURRENT_YEAR = new Date().getFullYear();
@@ -52,13 +52,13 @@ function FooterLink({
     fontSize: 14,
     fontWeight: 400,
     textDecoration: "none",
-    display: "block",
     marginBottom: 10,
     minHeight: 44,
     display: "flex",
     alignItems: "center",
   };
 
+  // External links (email, whatsapp)
   if (external) {
     return (
       <a
@@ -73,6 +73,16 @@ function FooterLink({
     );
   }
 
+  // Hash links for internal navigation
+  if (href.startsWith("#")) {
+    return (
+      <a href={href} className="footer-link" style={sharedStyle}>
+        {children}
+      </a>
+    );
+  }
+
+  // Default to Next Link for other cases
   return (
     <Link href={href} className="footer-link" style={sharedStyle}>
       {children}

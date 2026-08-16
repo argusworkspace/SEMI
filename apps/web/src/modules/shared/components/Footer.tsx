@@ -1,11 +1,7 @@
 import Link from "next/link";
 import {
-  COLOR_ASPHALT,
-  COLOR_PAPER,
   COLOR_VOLT,
 } from "@/lib/design-tokens";
-
-// Footer is a Server Component — no event handlers; hover via CSS class
 
 const QUICK_LINKS = [
   { label: "Products",      href: "#products" },
@@ -16,14 +12,13 @@ const QUICK_LINKS = [
 
 const CURRENT_YEAR = new Date().getFullYear();
 
-// ── Reusable column heading ──────────────────────────────────────────────────
 function ColHeading({ children }: { children: React.ReactNode }) {
   return (
     <p
       style={{
         fontFamily: "var(--font-space-grotesk), sans-serif",
         fontSize: 12,
-        fontWeight: 600,
+        fontWeight: 700,
         letterSpacing: "0.1em",
         textTransform: "uppercase",
         color: COLOR_VOLT,
@@ -36,7 +31,6 @@ function ColHeading({ children }: { children: React.ReactNode }) {
   );
 }
 
-// ── Reusable footer link — hover handled by .footer-link CSS class ────────────
 function FooterLink({
   href,
   children,
@@ -47,7 +41,7 @@ function FooterLink({
   external?: boolean;
 }) {
   const sharedStyle: React.CSSProperties = {
-    color: COLOR_PAPER,
+    color: "#EDE8E0",
     fontFamily: "var(--font-inter), sans-serif",
     fontSize: 14,
     fontWeight: 400,
@@ -58,22 +52,14 @@ function FooterLink({
     alignItems: "center",
   };
 
-  // External links (email, whatsapp)
   if (external) {
     return (
-      <a
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="footer-link"
-        style={sharedStyle}
-      >
+      <a href={href} target="_blank" rel="noopener noreferrer" className="footer-link" style={sharedStyle}>
         {children}
       </a>
     );
   }
 
-  // Hash links for internal navigation
   if (href.startsWith("#")) {
     return (
       <a href={href} className="footer-link" style={sharedStyle}>
@@ -82,7 +68,6 @@ function FooterLink({
     );
   }
 
-  // Default to Next Link for other cases
   return (
     <Link href={href} className="footer-link" style={sharedStyle}>
       {children}
@@ -92,49 +77,60 @@ function FooterLink({
 
 export default function Footer() {
   return (
-    <footer
-      style={{ backgroundColor: COLOR_ASPHALT }}
-      aria-label="Site footer"
-    >
+    <footer style={{ backgroundColor: "#0F1B2D", position: "relative", overflow: "hidden" }} aria-label="Site footer">
       <div className="layout-container">
-        {/* Top volt accent line */}
+        {/* Top gold accent line */}
         <span
           aria-hidden="true"
           style={{
             display: "block",
-            height: 2,
-            width: 40,
-            backgroundColor: COLOR_VOLT,
-            borderRadius: 1,
+            height: 3,
+            width: 48,
+            background: "linear-gradient(90deg, #D4A843, #F0C060)",
+            borderRadius: 2,
             marginTop: 56,
             marginBottom: 48,
           }}
         />
 
-        {/* 3-col desktop / 2-col tablet / 1-col mobile via .footer-grid CSS class */}
-        <div className="footer-grid" style={{ display: "grid", gap: "40px 48px" }}>
-
+        <div className="footer-grid">
           {/* ── Col 1: Brand blurb ──────────────────────────────────── */}
           <div>
-            <p
-              style={{
-                fontFamily: "var(--font-space-grotesk), sans-serif",
-                fontSize: 20,
-                fontWeight: 700,
-                color: COLOR_PAPER,
-                margin: "0 0 12px",
-                letterSpacing: "-0.01em",
-              }}
-            >
-              SEMY
-            </p>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+               <span
+                  aria-hidden="true"
+                  style={{
+                    width: 24, height: 24,
+                    background: "linear-gradient(135deg, #D4A843, #F0C060)",
+                    borderRadius: 4,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    flexShrink: 0,
+                    fontFamily: "var(--font-space-grotesk), sans-serif",
+                    fontSize: 12, fontWeight: 700,
+                    color: "#0F1B2D",
+                  }}
+                >
+                  S
+                </span>
+              <p
+                style={{
+                  fontFamily: "var(--font-space-grotesk), sans-serif",
+                  fontSize: 20,
+                  fontWeight: 700,
+                  color: "#FFFFFF",
+                  margin: 0,
+                  letterSpacing: "-0.01em",
+                }}
+              >
+                SEMY
+              </p>
+            </div>
             <p
               style={{
                 fontFamily: "var(--font-inter), sans-serif",
                 fontSize: 14,
-                lineHeight: "22px",
-                color: COLOR_PAPER,
-                opacity: 0.6,
+                lineHeight: "24px",
+                color: "#8896A5",
                 maxWidth: 280,
                 margin: 0,
               }}
@@ -171,8 +167,8 @@ export default function Footer() {
         <div
           style={{
             marginTop: 48,
-            paddingTop: 20,
-            paddingBottom: 28,
+            paddingTop: 24,
+            paddingBottom: 32,
             borderTop: "1px solid rgba(255,255,255,0.08)",
             display: "flex",
             alignItems: "center",
@@ -185,8 +181,7 @@ export default function Footer() {
             style={{
               fontFamily: "var(--font-inter), sans-serif",
               fontSize: 12,
-              color: COLOR_PAPER,
-              opacity: 0.4,
+              color: "#8896A5",
               margin: 0,
             }}
           >
@@ -196,8 +191,7 @@ export default function Footer() {
             style={{
               fontFamily: "var(--font-inter), sans-serif",
               fontSize: 12,
-              color: COLOR_PAPER,
-              opacity: 0.4,
+              color: "#8896A5",
               margin: 0,
             }}
           >

@@ -1,58 +1,50 @@
 /**
- * SEMY Design Tokens
- *
- * Single source of truth for all brand constants.
- * The Tailwind v4 @theme block in globals.css mirrors every token here.
- * Import these in components for type-safe inline styles.
+ * SEMY Design Tokens — Cream White + Navy Blue
  */
 
-// ── Colors ────────────────────────────────────────────────────────────────────
+// ── Core Palette ──────────────────────────────────────────────────────────────
 
-/** Header / nav / footer background; primary text */
-export const COLOR_ASPHALT = "#1C1F22";
+/** Deep navy — primary background, headers, CTAs */
+export const COLOR_ASPHALT  = "#0F1B2D";
 
-/** Page background — warm off-white */
-export const COLOR_PAPER = "#F6F4EF";
+/** Card / surface — dark navy blue */
+export const COLOR_PAPER    = "#F7F3EE";
 
-/** Primary accent — main CTAs and the Pay Advance button ONLY */
-export const COLOR_VOLT = "#C8F135";
+/** Primary accent — warm gold/amber for CTAs */
+export const COLOR_VOLT     = "#D4A843";
 
-/** Secondary accent — Learn More / secondary actions */
-export const COLOR_AMBER = "#E8772E";
+/** Secondary accent — muted gold */
+export const COLOR_AMBER    = "#C49830";
 
-/** Labels, captions, spec keys */
-export const COLOR_STEEL = "#5B6470";
+/** Muted text — soft grey-blue */
+export const COLOR_STEEL    = "#8896A5";
 
 /** Borders and dividers */
-export const COLOR_HAIRLINE = "#DEDAD0";
+export const COLOR_HAIRLINE = "#E2DDD6";
+
+// ── Extended Palette ──────────────────────────────────────────────────────────
+
+/** Cream background */
+export const COLOR_CREAM    = "#F7F3EE";
+
+/** Mid navy — for sections */
+export const COLOR_NAVY     = "#162033";
+
+/** Light navy — for cards on dark */
+export const COLOR_NAVY_CARD = "#1E2E45";
+
+/** Cream text on dark */
+export const COLOR_CREAM_TEXT = "#EDE8E0";
 
 // ── Typography ────────────────────────────────────────────────────────────────
-
 export const FONT_DISPLAY = "var(--font-space-grotesk)";
 export const FONT_BODY    = "var(--font-inter)";
 
-export const TYPE_SCALE = {
-  h1:        { fontSize: "44px", lineHeight: "52px", fontWeight: 700 },
-  h2:        { fontSize: "30px", lineHeight: "38px", fontWeight: 600 },
-  h3:        { fontSize: "20px", lineHeight: "28px", fontWeight: 600 },
-  body:      { fontSize: "16px", lineHeight: "24px", fontWeight: 400 },
-  caption:   { fontSize: "13px", lineHeight: "18px", fontWeight: 400 },
-  specLabel: { fontSize: "12px", lineHeight: "16px", fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase" as const },
-} as const;
-
 // ── Layout ────────────────────────────────────────────────────────────────────
-
 export const LAYOUT_MAX_WIDTH       = "1200px";
-export const LAYOUT_PADDING_MOBILE  = "20px";
+export const LAYOUT_PADDING_MOBILE  = "16px";
 export const LAYOUT_PADDING_DESKTOP = "64px";
 
 // ── Borders ───────────────────────────────────────────────────────────────────
-
-/** Everywhere: sharp, spec-plate feel */
-export const BORDER_RADIUS = "2px";
-
-/** Standard border — always 1px solid, never box-shadow */
+export const BORDER_RADIUS   = "4px";
 export const BORDER_STANDARD = `1px solid ${COLOR_HAIRLINE}`;
-
-/** Dashed border — reserved for tear-line dividers inside product cards */
-export const BORDER_TEARLINE = `1px dashed ${COLOR_HAIRLINE}`;

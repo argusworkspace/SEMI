@@ -650,10 +650,10 @@ export default function PayAdvanceModal({
     <>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
+        .modal-body { -webkit-overflow-scrolling: touch; }
         @media (max-width: 640px) {
           .modal-panel { max-width:100%!important; max-height:100vh!important; height:100vh!important; border-radius:0!important; border:none!important; }
           .modal-overlay { padding:0!important; }
-          .modal-body { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; }
           .modal-form-actions { position:sticky; bottom:0; background:#fff; padding:16px 20px!important; border-top:1px solid ${COLOR_HAIRLINE}; margin:0 -20px -24px -20px; }
         }
       `}</style>
@@ -665,10 +665,11 @@ export default function PayAdvanceModal({
 
         <div className="modal-panel" style={{
           backgroundColor: "#FFFFFF", width: "100%", maxWidth: 480,
-          maxHeight: "90vh", overflowY: "auto", overscrollBehavior: "contain", borderRadius: 2,
+          maxHeight: "90vh", overflow: "hidden", borderRadius: 2,
           border: `1px solid ${COLOR_HAIRLINE}`, display: "flex", flexDirection: "column",
         }}>
-          {/* Header */}
+          {/* Header — flexShrink:0 keeps this fixed; only .modal-body below scrolls,
+              so the product name, advance amount, and close button never clip mid-scroll */}
           <div style={{ backgroundColor: COLOR_ASPHALT, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <div style={{ width: 48, height: 48, borderRadius: 2, border: "1px solid rgba(255,255,255,0.12)", backgroundColor: "rgba(255,255,255,0.06)", overflow: "hidden", flexShrink: 0 }}>
@@ -686,8 +687,8 @@ export default function PayAdvanceModal({
             </button>
           </div>
 
-          {/* Body */}
-          <div className="modal-body" style={{ padding: "24px 20px" }}>
+          {/* Body — the only scrollable region in the modal */}
+          <div className="modal-body" style={{ padding: "24px 20px", flex: 1, overflowY: "auto", overscrollBehavior: "contain" }}>
             <StepIndicator current={step} />
 
             {/* Price breakdown (always visible) */}

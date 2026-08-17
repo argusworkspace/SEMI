@@ -316,6 +316,21 @@ button, a, [role="button"] { min-height: 44px; }
   }
 }
 
+/* ── Print: hide site chrome everywhere (nav, footer, floating cart, drawer) ─── */
+@media print {
+  header,
+  footer,
+  .fc-btn,
+  .cd-overlay,
+  .cd-panel {
+    display: none !important;
+  }
+
+  body {
+    overflow: visible !important;
+  }
+}
+
 /* ── Mobile: improve touch scrolling everywhere ─────────────────────────────── */
 @media (max-width: 767px) {
   * {

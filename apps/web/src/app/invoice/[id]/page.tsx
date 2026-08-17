@@ -83,11 +83,12 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
           .no-print { display: none !important; }
           body { margin: 0; }
         }
-        @page { size: A4; margin: 12mm; }
+        @page { size: A4; margin: 8mm; }
       `}</style>
 
       {/* ── Invoice ── */}
-      <div style={{ maxWidth: 800, margin: "0 auto", border: "2px solid #000", fontFamily: "Arial, sans-serif" }}>
+      <div style={{ maxWidth: 800, margin: "0 auto", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+      <div style={{ minWidth: 620, border: "2px solid #000", fontFamily: "Arial, sans-serif" }}>
 
         {/* Title */}
         <div style={{ textAlign: "center", borderBottom: "1px solid #000", padding: "6px 0" }}>
@@ -196,8 +197,8 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
               <td style={tdR}>{fmtNum(inv.taxable_value)}</td>
             </tr>
             {/* Padding rows */}
-            {[...Array(4)].map((_, i) => (
-              <tr key={i} style={{ height: 22 }}>
+            {[...Array(2)].map((_, i) => (
+              <tr key={i} style={{ height: 18 }}>
                 <td style={td} />
                 <td style={td} />
                 <td style={td} />
@@ -298,8 +299,8 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
               We declare that this invoice shows the actual price of the goods described
               and that all particulars are true and correct.
             </div>
-            <div style={{ marginTop: 20 }}>
-              <div style={{ borderTop: "1px solid #999", display: "inline-block", width: 120, marginTop: 20 }} />
+            <div style={{ marginTop: 12 }}>
+              <div style={{ borderTop: "1px solid #999", display: "inline-block", width: 120, marginTop: 12 }} />
               <div style={{ fontSize: 10, color: "#777" }}>Customer&apos;s Seal and Signature</div>
             </div>
           </div>
@@ -326,9 +327,9 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
                 </table>
               </>
             )}
-            <div style={{ textAlign: "right", marginTop: 20 }}>
+            <div style={{ textAlign: "right", marginTop: 12 }}>
               <div style={{ fontWeight: 600, fontSize: 12 }}>for {inv.seller_name}</div>
-              <div style={{ height: 40 }} />
+              <div style={{ height: 26 }} />
               <div style={{ borderTop: "1px solid #999", display: "inline-block", width: 120 }} />
               <div style={{ fontSize: 10, color: "#777" }}>Authorised Signatory</div>
             </div>
@@ -339,6 +340,7 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
         <div style={{ borderTop: "1px solid #000", padding: "4px 10px", textAlign: "center", fontSize: 10, color: "#555" }}>
           This is a Computer Generated Invoice
         </div>
+      </div>
       </div>
     </div>
   );

@@ -190,7 +190,7 @@ export default function Header() {
             >
               {[0, 1, 2].map((i) => (
                 <span key={i} style={{
-                  display: "block", width: 20, height: 1.5,
+                  display: "block", height: 1.5,
                   background: "#EDE8E0", borderRadius: 2,
                   transformOrigin: "center",
                   transition: "transform 220ms ease, opacity 220ms ease, width 220ms ease",

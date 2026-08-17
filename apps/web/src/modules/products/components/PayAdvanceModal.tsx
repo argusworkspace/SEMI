@@ -209,11 +209,18 @@ function PriceRow({ label, value, note, bold, accent, muted }: {
 }
 
 // ── Step 2: Payment Instructions ──────────────────────────────────────────────
-const UPI_APPS = [
-  { id: "gpay",    name: "GPay",    bg: "#1a73e8", label: "G",  scheme: "tez://upi/pay" },
-  { id: "phonepe", name: "PhonePe", bg: "#5f259f", label: "Pe", scheme: "phonepe://pay" },
-  { id: "paytm",   name: "Paytm",   bg: "#00BAF2", label: "Pt", scheme: "paytmmp://upi/pay" },
-  { id: "upi",     name: "Any UPI", bg: "#F97316", label: "₹",  scheme: "upi://pay" },
+// A single generic upi://pay intent — not app-specific links for GPay/PhonePe/
+// Paytm — is what actually works reliably: Android/iOS hands it to whichever
+// UPI app the customer has (or shows a chooser if there are several). App-
+// specific custom schemes (tez://, phonepe://) are inconsistently registered
+// across app versions and often silently no-op from a mobile browser.
+//
+// The small logos below the button are purely a "works with" trust strip
+// (local static assets — see public/images/upi/), not separate buttons.
+const TRUST_LOGOS = [
+  { id: "gpay", name: "GPay", src: "/images/upi/gpay.svg" },
+  { id: "phonepe", name: "PhonePe", src: "/images/upi/phonepe.svg" },
+  { id: "paytm", name: "Paytm", src: "/images/upi/paytm.svg" },
 ];
 
 function PaymentStep({
@@ -236,10 +243,12 @@ function PaymentStep({
   const upiParams = new URLSearchParams({
     pa: upiId,
     pn: upiName,
-    am: String(advanceAmount),
+    am: advanceAmount.toFixed(2),
     cu: "INR",
     tn: `SEMY ${order.orderNumber}`,
+    tr: order.orderNumber,
   }).toString();
+  const upiLink = `upi://pay?${upiParams}`;
 
   function copyUpi() {
     navigator.clipboard.writeText(upiId).then(() => {
@@ -251,36 +260,29 @@ function PaymentStep({
   return (
     <div>
       <p style={{ fontSize: 14, color: COLOR_STEEL, marginBottom: 20, fontFamily: "var(--font-inter), sans-serif", lineHeight: "20px" }}>
-        Tap your UPI app to pay exactly{" "}
-        <strong style={{ color: COLOR_ASPHALT }}>{fmt(advanceAmount)}</strong>.
+        Tap below to pay exactly{" "}
+        <strong style={{ color: COLOR_ASPHALT }}>{fmt(advanceAmount)}</strong> from your UPI app.
         After paying, take a screenshot and upload it in the next step.
       </p>
 
-      {/* UPI App buttons */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 24 }}>
-        {UPI_APPS.map((app) => (
-          <a
-            key={app.id}
-            href={`${app.scheme}?${upiParams}`}
-            style={{ textDecoration: "none", textAlign: "center" }}
-          >
-            <div style={{
-              width: "100%", aspectRatio: "1 / 1", borderRadius: 16,
-              backgroundColor: app.bg,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              marginBottom: 6, fontSize: 20, fontWeight: 700, color: "#fff",
-              fontFamily: "var(--font-space-grotesk), sans-serif",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
-            }}>
-              {app.label}
-            </div>
-            <span style={{
-              fontSize: 11, color: COLOR_ASPHALT, fontWeight: 500,
-              fontFamily: "var(--font-inter), sans-serif", display: "block",
-            }}>
-              {app.name}
-            </span>
-          </a>
+      {/* Pay via UPI */}
+      <a href={upiLink} style={{
+        display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+        width: "100%", padding: "14px 20px", backgroundColor: COLOR_VOLT,
+        color: COLOR_ASPHALT, fontFamily: "var(--font-space-grotesk), sans-serif",
+        fontSize: 15, fontWeight: 700, borderRadius: 2, textDecoration: "none",
+        boxSizing: "border-box", marginBottom: 10,
+      }}>
+        Pay {fmt(advanceAmount)} via UPI App →
+      </a>
+
+      {/* Trust strip: small app marks, not separate buttons */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 24 }}>
+        <span style={{ fontSize: 11, color: COLOR_STEEL, fontFamily: "var(--font-inter), sans-serif" }}>Works with</span>
+        {TRUST_LOGOS.map((logo) => (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img key={logo.id} src={logo.src} alt={logo.name} width={20} height={20}
+            style={{ borderRadius: "50%", boxShadow: "0 0 0 1px rgba(0,0,0,0.06)" }} />
         ))}
       </div>
 
@@ -574,9 +576,11 @@ function DoneStep({ order, ocr, invoiceId, onClose }: {
 export default function PayAdvanceModal({
   product,
   onClose,
+  onPaid,
 }: {
   product: Product;
   onClose: () => void;
+  onPaid?: () => void;
 }) {
   const router = useRouter();
   const [step, setStep] = useState<Step>("details");
@@ -648,6 +652,7 @@ export default function PayAdvanceModal({
   }
 
   function handleUploadDone(ocrResult: OcrCheck, newInvoiceId: string | null) {
+    onPaid?.();
     setOcr(ocrResult);
     setInvoiceId(newInvoiceId);
     if (newInvoiceId) {

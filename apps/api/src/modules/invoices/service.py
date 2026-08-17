@@ -5,7 +5,7 @@ from decimal import ROUND_HALF_UP, Decimal
 from fastapi import HTTPException
 
 from src.core.config import settings
-from src.modules.orders.models import ADVANCE_AMOUNT
+from src.modules.orders.models import ADVANCE_AMOUNT, PaymentStatus
 from src.modules.orders.repository import OrderRepository, PaymentRepository
 
 from .models import Buyer, TaxInvoice
@@ -128,7 +128,9 @@ class InvoiceService:
             upi_amount=payment.amount if payment else None,
             upi_date=payment.upi_date if payment else None,
             upi_time=payment.upi_time if payment else None,
-            payment_status=payment.status.value if payment else "CREATED",
+            payment_status=(
+                payment.status.value if isinstance(payment.status, PaymentStatus) else payment.status
+            ) if payment else "CREATED",
 
             # GST
             hsn_code=settings.product_hsn,

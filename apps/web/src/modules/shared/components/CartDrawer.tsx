@@ -218,6 +218,7 @@ export default function CartDrawer() {
         <PayAdvanceModal
           product={bookingProduct}
           onClose={() => setBookingProduct(null)}
+          onPaid={() => removeFromCart(bookingProduct.id)}
         />
       )}
     </>

@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "crypto";
-
-const API_URL =
-  process.env.API_URL ??
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ??
-  process.env.NEXT_PUBLIC_API_URL ??
-  "http://localhost:8000";
+import { internalFetch } from "@/lib/api/server";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -22,7 +17,7 @@ export async function POST(req: NextRequest) {
     city,
   } = body;
 
-  const res = await fetch(`${API_URL}/orders`, {
+  const res = await internalFetch(`/orders`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

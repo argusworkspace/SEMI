@@ -1,15 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-
-const API_URL =
-  process.env.API_URL ??
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ??
-  process.env.NEXT_PUBLIC_API_URL ??
-  "http://localhost:8000";
+import { internalFetch } from "@/lib/api/server";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
 
-  const res = await fetch(`${API_URL}/invoices`, {
+  const res = await internalFetch(`/invoices`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

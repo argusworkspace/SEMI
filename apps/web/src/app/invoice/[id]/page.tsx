@@ -1,14 +1,9 @@
 import { notFound } from "next/navigation";
 import { PrintButton } from "./PrintButton";
-
-const API_URL =
-  process.env.API_URL ??
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ??
-  process.env.NEXT_PUBLIC_API_URL ??
-  "http://localhost:8000";
+import { internalFetch } from "@/lib/api/server";
 
 async function getInvoice(id: string) {
-  const res = await fetch(`${API_URL}/invoices/${id}`, { cache: "no-store" });
+  const res = await internalFetch(`/invoices/${id}`, { cache: "no-store" });
   if (!res.ok) return null;
   return res.json();
 }

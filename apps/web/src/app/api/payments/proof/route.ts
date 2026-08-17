@@ -1,10 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-
-const API_URL =
-  process.env.API_URL ??
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ??
-  process.env.NEXT_PUBLIC_API_URL ??
-  "http://localhost:8000";
+import { internalFetch } from "@/lib/api/server";
 
 export async function POST(req: NextRequest) {
   const formData = await req.formData();
@@ -22,7 +17,7 @@ export async function POST(req: NextRequest) {
   const apiForm = new FormData();
   apiForm.append("file", file);
 
-  const res = await fetch(`${API_URL}/orders/${orderId}/payment-proof`, {
+  const res = await internalFetch(`/orders/${orderId}/payment-proof`, {
     method: "POST",
     body: apiForm,
   });

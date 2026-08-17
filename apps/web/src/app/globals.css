@@ -21,6 +21,8 @@
 
 /* ── CSS Custom Properties ──────────────────────────────────────────────────── */
 :root {
+  --font-space-grotesk: 'Space Grotesk', sans-serif;
+  --font-inter: 'Inter', sans-serif;
   --navy:          #0F1B2D;
   --navy-mid:      #162033;
   --navy-card:     #1E2E45;

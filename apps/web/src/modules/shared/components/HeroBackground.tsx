@@ -2,21 +2,33 @@
 
 import { useState, useEffect } from "react";
 
-/**
- * Renders a full-bleed autoplaying video background for all viewports.
- * Mobile browsers (iOS Safari 10+, Chrome Android) support muted inline
- * autoplay when `playsInline` + `muted` are set — exactly what we have.
- * The static poster image remains visible until the video loads.
- */
 export default function HeroBackground() {
   const [mounted, setMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-  // Defer mount to avoid SSR/hydration mismatch — same pattern as before
   useEffect(() => {
+    setIsMobile(window.matchMedia("(max-width: 767px)").matches);
     setMounted(true);
   }, []);
 
   if (!mounted) return null;
+
+  // Skip the 4.7 MB video on mobile — show the poster image instead
+  if (isMobile) {
+    return (
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundImage: "url(/images/hero-poster.jpg)",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          zIndex: 0,
+        }}
+      />
+    );
+  }
 
   return (
     <video

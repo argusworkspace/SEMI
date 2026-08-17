@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 interface AchievementCard {
   /** Absolute-from-public path, e.g. "/images/acheivements/dignitary-meet.jpeg" */
   image: string;
@@ -54,12 +56,16 @@ export default function AchievementsStrip({ achievements }: AchievementsStripPro
         >
           {achievements.map((card, index) => (
             <div key={index} className="achievements-card">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={card.image}
-                alt={card.title}
-                className="achievements-card-img"
-              />
+              <div style={{ position: "relative", width: "100%", aspectRatio: "4/3" }}>
+                <Image
+                  src={card.image}
+                  alt={card.title}
+                  fill
+                  style={{ objectFit: "cover" }}
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  loading="lazy"
+                />
+              </div>
               <div className="achievements-card-body">
                 <div
                   style={{

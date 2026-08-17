@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import type { Product } from "@/types/product";
 import { useCart } from "@/modules/shared/context/CartContext";
@@ -155,11 +156,15 @@ export default function ProductDetailClient({ product }: { product: Product }) {
             <span style={{ position: "absolute", top: 14, right: 14, fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", padding: "5px 12px", borderRadius: 20, backgroundColor: product.inStock ? "rgba(15,27,45,0.85)" : "rgba(136,150,165,0.85)", color: product.inStock ? "#D4A843" : "#FFFFFF", backdropFilter: "blur(4px)", fontFamily: "var(--font-inter), sans-serif", zIndex: 1 }}>
               {product.inStock ? "In Stock" : "Out of Stock"}
             </span>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={product.imageUrl} alt={product.name} style={{ maxWidth: "85%", maxHeight: 340, objectFit: "contain", display: "block", transition: "transform 400ms ease" }}
-              onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.04) translateY(-6px)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.transform = ""; }}
-              onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+            <Image
+              src={product.imageUrl}
+              alt={product.name}
+              width={520}
+              height={340}
+              priority
+              style={{ maxWidth: "85%", maxHeight: 340, objectFit: "contain", display: "block", transition: "transform 400ms ease", width: "auto", height: "auto" }}
+              onMouseEnter={(e) => { (e.target as HTMLImageElement).style.transform = "scale(1.04) translateY(-6px)"; }}
+              onMouseLeave={(e) => { (e.target as HTMLImageElement).style.transform = ""; }}
             />
           </div>
 

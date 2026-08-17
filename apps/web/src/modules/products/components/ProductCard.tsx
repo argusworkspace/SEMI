@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import type { Product } from "@/types/product";
 import { useCart } from "@/modules/shared/context/CartContext";
@@ -172,10 +173,14 @@ export default function ProductCard({ product }: { product: Product }) {
       <article className="pc-root" aria-label={`${product.name} product card`}>
         {/* Image */}
         <div className="pc-img-wrap">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={product.imageUrl} alt={product.name} className="pc-img"
-            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+          <Image
+            src={product.imageUrl}
+            alt={product.name}
+            fill
+            className="pc-img"
+            style={{ objectFit: "contain", padding: 12 }}
+            sizes="(max-width: 640px) 50vw, 300px"
+            loading="lazy"
           />
           <span
             className="pc-stock"

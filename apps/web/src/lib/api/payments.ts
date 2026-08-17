@@ -37,24 +37,6 @@ export interface ProofResponse {
   error?: string;
 }
 
-// Legacy — kept for backwards-compat
-export interface AdvancePaymentPayload {
-  productId: string;
-  productName: string;
-  customerName: string;
-  phone: string;
-  color: string;
-  city: string;
-  advanceAmount: number;
-}
-
-export interface AdvancePaymentResponse {
-  success: boolean;
-  transactionId?: string;
-  paymentUrl?: string;
-  error?: string;
-}
-
 // ── API calls ─────────────────────────────────────────────────────────────────
 
 export async function createOrder(
@@ -90,32 +72,3 @@ export async function submitPaymentProof(
   return res.json();
 }
 
-// Legacy initiateAdvancePayment (kept so existing imports don't break)
-export async function initiateAdvancePayment(
-  payload: AdvancePaymentPayload
-): Promise<AdvancePaymentResponse> {
-  const res = await fetch("/api/payments/advance", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      idempotencyKey: `${payload.productId}-${payload.phone}-${Date.now()}`,
-      productId: payload.productId,
-      productName: payload.productName,
-      color: payload.color,
-      unitPrice: payload.advanceAmount * 5,
-      customerName: payload.customerName,
-      email: `${payload.phone}@semy.in`,
-      phone: payload.phone,
-      city: payload.city,
-    }),
-  });
-  if (!res.ok) {
-    return { success: false, error: `Server error ${res.status}` };
-  }
-  const data = await res.json();
-  return {
-    success: data.success,
-    transactionId: data.orderNumber,
-    error: data.error,
-  };
-}

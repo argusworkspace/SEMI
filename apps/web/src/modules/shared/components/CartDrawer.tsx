@@ -1,16 +1,21 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useCart } from "@/modules/shared/context/CartContext";
+import type { Product } from "@/types/product";
+import PayAdvanceModal from "@/modules/products/components/PayAdvanceModal";
 
 function fmt(n: number) { return "₹" + n.toLocaleString("en-IN"); }
 function colorName(hex: string) {
   return ({ "#FFFFFF": "Pearl White", "#3B82F6": "Ocean Blue", "#EAB308": "Solar Yellow", "#374151": "Charcoal Grey" } as Record<string, string>)[hex.toUpperCase()] ?? hex;
 }
 
+const ADVANCE_PER_ITEM = 5000;
+
 export default function CartDrawer() {
-  const { items, totalItems, totalAmount, isDrawerOpen, closeDrawer, removeFromCart, updateQuantity, clearCart } = useCart();
+  const { items, totalItems, isDrawerOpen, closeDrawer, removeFromCart, updateQuantity, clearCart } = useCart();
   const drawerRef = useRef<HTMLDivElement>(null);
+  const [bookingProduct, setBookingProduct] = useState<Product | null>(null);
 
   useEffect(() => {
     if (!isDrawerOpen) return;
@@ -26,8 +31,14 @@ export default function CartDrawer() {
     }
   }, [isDrawerOpen]);
 
-  const gst = Math.round(totalAmount * 0.18);
-  const grand = totalAmount + gst;
+  const totalUnits = items.reduce((s, i) => s + i.quantity, 0);
+  const totalAdvance = totalUnits * ADVANCE_PER_ITEM;
+
+  function handleCheckout() {
+    if (items.length === 0) return;
+    closeDrawer();
+    setBookingProduct(items[0].product);
+  }
 
   return (
     <>
@@ -177,20 +188,23 @@ export default function CartDrawer() {
                 {/* Footer */}
                 <div style={{ borderTop: "1px solid #E2DDD6", padding: "14px 16px 18px", flexShrink: 0, background: "#FDFAF6" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
-                    <span style={{ fontFamily: "var(--font-inter), sans-serif", fontSize: 12, color: "#8896A5" }}>Subtotal</span>
-                    <span style={{ fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 13, fontWeight: 600, color: "#162033" }}>{fmt(totalAmount)}</span>
+                    <span style={{ fontFamily: "var(--font-inter), sans-serif", fontSize: 12, color: "#8896A5" }}>Advance per bike</span>
+                    <span style={{ fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 13, fontWeight: 600, color: "#162033" }}>₹5,000</span>
                   </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
-                    <span style={{ fontFamily: "var(--font-inter), sans-serif", fontSize: 12, color: "#8896A5" }}>GST (18%)</span>
-                    <span style={{ fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 13, fontWeight: 600, color: "#8896A5" }}>{fmt(gst)}</span>
-                  </div>
+                  {totalUnits > 1 && (
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
+                      <span style={{ fontFamily: "var(--font-inter), sans-serif", fontSize: 12, color: "#8896A5" }}>× {totalUnits} bikes</span>
+                      <span style={{ fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 13, fontWeight: 600, color: "#8896A5" }}>{fmt(totalAdvance)}</span>
+                    </div>
+                  )}
                   <div style={{ borderTop: "1px dashed #E2DDD6", margin: "8px 0 12px" }} />
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 14 }}>
-                    <span style={{ fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 14, fontWeight: 700, color: "#0F1B2D" }}>Total</span>
-                    <span style={{ fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 22, fontWeight: 700, color: "#D4A843" }}>{fmt(grand)}</span>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 4 }}>
+                    <span style={{ fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 14, fontWeight: 700, color: "#0F1B2D" }}>Pay now</span>
+                    <span style={{ fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 22, fontWeight: 700, color: "#D4A843" }}>{fmt(totalAdvance)}</span>
                   </div>
-                  <button id="cart-checkout-btn" className="cd-checkout-btn" onClick={() => alert(`Cashfree payment integration coming soon!\n\nItems: ${totalItems}\nTotal: ${fmt(grand)}`)}>
-                    Proceed to Checkout — {fmt(grand)}
+                  <p style={{ fontFamily: "var(--font-inter), sans-serif", fontSize: 11, color: "#8896A5", margin: "0 0 12px" }}>Balance payable on delivery</p>
+                  <button id="cart-checkout-btn" className="cd-checkout-btn" onClick={handleCheckout}>
+                    Book with {fmt(totalAdvance)} Advance
                   </button>
                   <button className="cd-clear-btn" onClick={clearCart}>Clear Cart</button>
                 </div>
@@ -198,6 +212,13 @@ export default function CartDrawer() {
             )}
           </div>
         </>
+      )}
+
+      {bookingProduct && (
+        <PayAdvanceModal
+          product={bookingProduct}
+          onClose={() => setBookingProduct(null)}
+        />
       )}
     </>
   );

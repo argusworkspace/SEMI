@@ -652,9 +652,12 @@ export default function PayAdvanceModal({
         @keyframes spin { to { transform: rotate(360deg); } }
         .modal-body { -webkit-overflow-scrolling: touch; }
         @media (max-width: 640px) {
-          .modal-panel { max-width:100%!important; max-height:100vh!important; height:100vh!important; border-radius:0!important; border:none!important; }
+          /* 100vh on mobile includes the space behind the browser's collapsible
+             address bar — 100dvh is the actual visible viewport. Keep the vh
+             line first as a fallback for browsers that don't support dvh. */
+          .modal-panel { max-width:100%!important; max-height:100vh!important; height:100vh!important; max-height:100dvh!important; height:100dvh!important; border-radius:0!important; border:none!important; }
           .modal-overlay { padding:0!important; }
-          .modal-form-actions { position:sticky; bottom:0; background:#fff; padding:16px 20px!important; border-top:1px solid ${COLOR_HAIRLINE}; margin:0 -20px -24px -20px; }
+          .modal-form-actions { position:sticky; bottom:0; background:#fff; padding:16px 20px!important; padding-bottom:max(16px, env(safe-area-inset-bottom))!important; border-top:1px solid ${COLOR_HAIRLINE}; margin:0 -20px -24px -20px; }
         }
       `}</style>
 
@@ -669,8 +672,9 @@ export default function PayAdvanceModal({
           border: `1px solid ${COLOR_HAIRLINE}`, display: "flex", flexDirection: "column",
         }}>
           {/* Header — flexShrink:0 keeps this fixed; only .modal-body below scrolls,
-              so the product name, advance amount, and close button never clip mid-scroll */}
-          <div style={{ backgroundColor: COLOR_ASPHALT, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
+              so the product name, advance amount, and close button never clip mid-scroll.
+              paddingTop clears the notch/status bar on full-screen mobile. */}
+          <div style={{ backgroundColor: COLOR_ASPHALT, padding: "16px 20px", paddingTop: "max(16px, env(safe-area-inset-top))", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <div style={{ width: 48, height: 48, borderRadius: 2, border: "1px solid rgba(255,255,255,0.12)", backgroundColor: "rgba(255,255,255,0.06)", overflow: "hidden", flexShrink: 0 }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -687,8 +691,9 @@ export default function PayAdvanceModal({
             </button>
           </div>
 
-          {/* Body — the only scrollable region in the modal */}
-          <div className="modal-body" style={{ padding: "24px 20px", flex: 1, overflowY: "auto", overscrollBehavior: "contain" }}>
+          {/* Body — the only scrollable region in the modal. paddingBottom clears
+              the home-indicator area so the last button is never flush with the edge. */}
+          <div className="modal-body" style={{ padding: "24px 20px", paddingBottom: "max(24px, env(safe-area-inset-bottom))", flex: 1, overflowY: "auto", overscrollBehavior: "contain" }}>
             <StepIndicator current={step} />
 
             {/* Price breakdown (always visible) */}

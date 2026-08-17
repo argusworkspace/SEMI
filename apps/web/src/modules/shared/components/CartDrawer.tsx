@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useCart } from "@/modules/shared/context/CartContext";
 import type { Product } from "@/types/product";
 import PayAdvanceModal from "@/modules/products/components/PayAdvanceModal";
+import { useBodyScrollLock } from "@/modules/shared/hooks/useBodyScrollLock";
 
 function fmt(n: number) { return "₹" + n.toLocaleString("en-IN"); }
 function colorName(hex: string) {
@@ -24,12 +25,7 @@ export default function CartDrawer() {
     return () => window.removeEventListener("keydown", onKey);
   }, [isDrawerOpen, closeDrawer]);
 
-  useEffect(() => {
-    if (isDrawerOpen) {
-      document.body.style.overflow = "hidden";
-      return () => { document.body.style.overflow = ""; };
-    }
-  }, [isDrawerOpen]);
+  useBodyScrollLock(isDrawerOpen);
 
   const totalUnits = items.reduce((s, i) => s + i.quantity, 0);
   const totalAdvance = totalUnits * ADVANCE_PER_ITEM;
@@ -153,7 +149,7 @@ export default function CartDrawer() {
             ) : (
               <>
                 {/* Items */}
-                <div style={{ flex: 1, overflowY: "auto", padding: "6px 16px", WebkitOverflowScrolling: "touch" }}>
+                <div style={{ flex: 1, overflowY: "auto", padding: "6px 16px", WebkitOverflowScrolling: "touch", overscrollBehavior: "contain" }}>
                   {items.map((item) => (
                     <div key={`${item.product.id}-${item.selectedColor}`} className="cd-item">
                       <div style={{ width: 64, height: 64, flexShrink: 0, background: "linear-gradient(145deg,#F0ECE5,#E8E2D8)", borderRadius: 8, border: "1px solid #E2DDD6", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>

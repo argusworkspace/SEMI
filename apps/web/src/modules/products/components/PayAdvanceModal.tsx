@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Product } from "@/types/product";
 import { createOrder, submitPaymentProof, type OcrCheck } from "@/lib/api/payments";
+import { useBodyScrollLock } from "@/modules/shared/hooks/useBodyScrollLock";
 import {
   COLOR_AMBER,
   COLOR_ASPHALT,
@@ -609,11 +610,7 @@ export default function PayAdvanceModal({
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose, step]);
 
-  useEffect(() => {
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = prev; };
-  }, []);
+  useBodyScrollLock(true);
 
   function set(field: keyof FormValues, value: string) {
     setForm((f) => ({ ...f, [field]: value }));
@@ -693,7 +690,7 @@ export default function PayAdvanceModal({
 
         <div className="modal-panel" style={{
           backgroundColor: "#FFFFFF", width: "100%", maxWidth: 480,
-          maxHeight: "90vh", overflowY: "auto", borderRadius: 2,
+          maxHeight: "90vh", overflowY: "auto", overscrollBehavior: "contain", borderRadius: 2,
           border: `1px solid ${COLOR_HAIRLINE}`, display: "flex", flexDirection: "column",
         }}>
           {/* Header */}

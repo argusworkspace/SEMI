@@ -241,16 +241,6 @@ function PaymentStep({
       .catch(() => {});
   }, []);
 
-  const upiParams = new URLSearchParams({
-    pa: upiId,
-    pn: upiName,
-    am: advanceAmount.toFixed(2),
-    cu: "INR",
-    tn: `SEMY ${order.orderNumber}`,
-    tr: order.orderNumber,
-  }).toString();
-  const upiLink = `upi://pay?${upiParams}`;
-
   function copyUpi() {
     navigator.clipboard.writeText(upiId).then(() => {
       setCopied(true);
@@ -260,25 +250,13 @@ function PaymentStep({
 
   return (
     <div>
-      <p style={{ fontSize: 14, color: COLOR_STEEL, marginBottom: 20, fontFamily: "var(--font-inter), sans-serif", lineHeight: "20px" }}>
-        Tap below to pay exactly{" "}
-        <strong style={{ color: COLOR_ASPHALT }}>{fmt(advanceAmount)}</strong> from your UPI app.
-        After paying, take a screenshot and upload it in the next step.
+      <p style={{ fontSize: 14, color: COLOR_STEEL, marginBottom: 16, fontFamily: "var(--font-inter), sans-serif", lineHeight: "20px" }}>
+        Pay exactly <strong style={{ color: COLOR_ASPHALT }}>{fmt(advanceAmount)}</strong> to
+        the UPI ID below from any UPI app. After paying, take a screenshot and upload it in the next step.
       </p>
 
-      {/* Pay via UPI */}
-      <a href={upiLink} style={{
-        display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-        width: "100%", padding: "14px 20px", backgroundColor: COLOR_VOLT,
-        color: COLOR_ASPHALT, fontFamily: "var(--font-space-grotesk), sans-serif",
-        fontSize: 15, fontWeight: 700, borderRadius: 2, textDecoration: "none",
-        boxSizing: "border-box", marginBottom: 10,
-      }}>
-        Pay {fmt(advanceAmount)} via UPI App →
-      </a>
-
-      {/* Trust strip: small app marks, not separate buttons */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 24 }}>
+      {/* Trust strip: small app marks, not links */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 18 }}>
         <span style={{ fontSize: 11, color: COLOR_STEEL, fontFamily: "var(--font-inter), sans-serif" }}>Works with</span>
         {TRUST_LOGOS.map((logo) => (
           // eslint-disable-next-line @next/next/no-img-element
@@ -287,31 +265,31 @@ function PaymentStep({
         ))}
       </div>
 
-      {/* Divider */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-        <div style={{ flex: 1, height: 1, backgroundColor: COLOR_HAIRLINE }} />
-        <span style={{ fontSize: 11, color: COLOR_STEEL, fontFamily: "var(--font-inter), sans-serif", textTransform: "uppercase", letterSpacing: "0.08em", whiteSpace: "nowrap" }}>
-          or pay manually
-        </span>
-        <div style={{ flex: 1, height: 1, backgroundColor: COLOR_HAIRLINE }} />
-      </div>
-
-      {/* UPI ID copy */}
-      <div style={{ border: `1px solid ${COLOR_HAIRLINE}`, borderRadius: 2, padding: "12px 14px", marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      {/* UPI ID — the primary, only payment path (a upi://pay deep link decodes to the
+          same payload as a QR code, so apps flag it the same way — the plain "send to
+          UPI ID" flow below is the one that doesn't trip that warning) */}
+      <div style={{ border: `1.5px solid ${COLOR_ASPHALT}`, borderRadius: 2, padding: "14px", marginBottom: 14, display: "flex", alignItems: "center", justifyContent: "space-between", backgroundColor: "rgba(200,241,53,0.08)" }}>
         <div>
-          <span style={{ fontSize: 11, color: COLOR_STEEL, display: "block", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 2, fontFamily: "var(--font-inter), sans-serif" }}>UPI ID</span>
-          <span style={{ fontSize: 15, fontWeight: 600, color: COLOR_ASPHALT, fontFamily: "var(--font-space-grotesk), sans-serif" }}>{upiId}</span>
+          <span style={{ fontSize: 11, color: COLOR_STEEL, display: "block", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 2, fontFamily: "var(--font-inter), sans-serif" }}>Pay to UPI ID</span>
+          <span style={{ fontSize: 17, fontWeight: 700, color: COLOR_ASPHALT, fontFamily: "var(--font-space-grotesk), sans-serif" }}>{upiId}</span>
         </div>
         <button onClick={copyUpi} style={{
-          padding: "6px 14px", fontSize: 12, fontWeight: 600,
-          backgroundColor: copied ? "#dcfce7" : COLOR_PAPER,
-          color: copied ? "#16a34a" : COLOR_STEEL,
-          border: `1px solid ${COLOR_HAIRLINE}`, borderRadius: 2, cursor: "pointer",
+          padding: "8px 16px", fontSize: 12, fontWeight: 600,
+          backgroundColor: copied ? "#dcfce7" : COLOR_ASPHALT,
+          color: copied ? "#16a34a" : COLOR_PAPER,
+          border: "none", borderRadius: 2, cursor: "pointer",
           fontFamily: "var(--font-inter), sans-serif", flexShrink: 0,
         }}>
-          {copied ? "Copied!" : "Copy"}
+          {copied ? "Copied!" : "Copy ID"}
         </button>
       </div>
+
+      {/* How-to steps */}
+      <ol style={{ margin: "0 0 16px", paddingLeft: 20, fontSize: 13, color: COLOR_STEEL, lineHeight: "22px", fontFamily: "var(--font-inter), sans-serif" }}>
+        <li>Open any UPI app (GPay, PhonePe, Paytm, BHIM…)</li>
+        <li>Tap <strong style={{ color: COLOR_ASPHALT }}>Pay</strong> / <strong style={{ color: COLOR_ASPHALT }}>Send</strong> → <strong style={{ color: COLOR_ASPHALT }}>To UPI ID / Bank Transfer</strong></li>
+        <li>Paste the UPI ID above and enter <strong style={{ color: COLOR_ASPHALT }}>{fmt(advanceAmount)}</strong></li>
+      </ol>
 
       {/* Order ref */}
       <div style={{ padding: "8px 14px", backgroundColor: COLOR_PAPER, border: `1px solid ${COLOR_HAIRLINE}`, borderRadius: 2, marginBottom: 20 }}>

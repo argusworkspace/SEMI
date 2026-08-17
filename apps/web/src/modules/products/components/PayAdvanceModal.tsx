@@ -210,14 +210,11 @@ function PriceRow({ label, value, note, bold, accent, muted }: {
 }
 
 // ── Step 2: Payment Instructions ──────────────────────────────────────────────
-// A single generic upi://pay intent — not app-specific links for GPay/PhonePe/
-// Paytm — is what actually works reliably: Android/iOS hands it to whichever
-// UPI app the customer has (or shows a chooser if there are several). App-
-// specific custom schemes (tez://, phonepe://) are inconsistently registered
-// across app versions and often silently no-op from a mobile browser.
-//
-// The small logos below the button are purely a "works with" trust strip
-// (local static assets — see public/images/upi/), not separate buttons.
+// One button, not an app picker. The upi://pay intent carries the receiver's
+// UPI ID (pa) and display name (pn) — whichever UPI app opens shows "Pay to
+// <pn> (<pa>)" already filled in, so the customer just confirms and pays,
+// nothing to search for or type. Small logos below are just a recognition
+// strip (local static assets — see public/images/upi/), not separate buttons.
 const TRUST_LOGOS = [
   { id: "gpay", name: "GPay", src: "/images/upi/gpay.svg" },
   { id: "phonepe", name: "PhonePe", src: "/images/upi/phonepe.svg" },
@@ -241,9 +238,10 @@ function PaymentStep({
       .catch(() => {});
   }, []);
 
-  // Standard NPCI UPI intent params (pa/pn/am/cu/tn/tr) — the same format used
-  // by every "Pay" button and payment QR code in the ecosystem. `tr` is a unique
-  // reference per NPCI spec, here the order number.
+  // Standard NPCI UPI intent params — pa/pn identify the receiver (UPI ID +
+  // name) so the app shows them pre-selected; am/cu/tn/tr fill in the amount,
+  // currency, note, and a unique reference. Same format every UPI QR/button
+  // in the ecosystem uses.
   const upiParams = new URLSearchParams({
     pa: upiId,
     pn: upiName,
@@ -269,7 +267,7 @@ function PaymentStep({
         After paying, take a screenshot and upload it in the next step.
       </p>
 
-      {/* Pay via UPI — standard upi://pay intent, same format every UPI QR/button uses */}
+      {/* Pay via UPI — opens with the receiver (UPI ID + name) already selected */}
       <a href={upiLink} style={{
         display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
         width: "100%", padding: "14px 20px", backgroundColor: COLOR_VOLT,
@@ -280,7 +278,7 @@ function PaymentStep({
         Pay {fmt(advanceAmount)} via UPI App →
       </a>
 
-      {/* Trust strip: small app marks, not links */}
+      {/* Recognition strip: small app marks, not links */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 16 }}>
         <span style={{ fontSize: 11, color: COLOR_STEEL, fontFamily: "var(--font-inter), sans-serif" }}>Works with</span>
         {TRUST_LOGOS.map((logo) => (

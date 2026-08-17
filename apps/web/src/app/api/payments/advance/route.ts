@@ -17,22 +17,26 @@ export async function POST(req: NextRequest) {
     city,
   } = body;
 
-  const res = await internalFetch(`/orders`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      idempotency_key: idempotencyKey ?? randomUUID(),
-      product_id: productId,
-      product_name: productName,
-      color: color ?? null,
-      unit_price: unitPrice,
-      customer_name: customerName,
-      customer_email: email ?? `${phone}@semy.in`,
-      customer_phone: phone,
-      delivery_pincode: null,
-      notes: city ? `City: ${city}` : null,
-    }),
-  });
+  const res = await internalFetch(
+    `/orders`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        idempotency_key: idempotencyKey ?? randomUUID(),
+        product_id: productId,
+        product_name: productName,
+        color: color ?? null,
+        unit_price: unitPrice,
+        customer_name: customerName,
+        customer_email: email ?? `${phone}@semy.in`,
+        customer_phone: phone,
+        delivery_pincode: null,
+        notes: city ? `City: ${city}` : null,
+      }),
+    },
+    req.nextUrl.origin
+  );
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: "Gateway error" }));

@@ -17,10 +17,11 @@ export async function POST(req: NextRequest) {
   const apiForm = new FormData();
   apiForm.append("file", file);
 
-  const res = await internalFetch(`/orders/${orderId}/payment-proof`, {
-    method: "POST",
-    body: apiForm,
-  });
+  const res = await internalFetch(
+    `/orders/${orderId}/payment-proof`,
+    { method: "POST", body: apiForm },
+    req.nextUrl.origin
+  );
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: "Upload failed" }));

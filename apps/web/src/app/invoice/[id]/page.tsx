@@ -1,9 +1,15 @@
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import { PrintButton } from "./PrintButton";
 import { internalFetch } from "@/lib/api/server";
 
 async function getInvoice(id: string) {
-  const res = await internalFetch(`/invoices/${id}`, { cache: "no-store" });
+  const h = await headers();
+  const host = h.get("host");
+  const proto = h.get("x-forwarded-proto") ?? "https";
+  const origin = host ? `${proto}://${host}` : undefined;
+
+  const res = await internalFetch(`/invoices/${id}`, { cache: "no-store" }, origin);
   if (!res.ok) return null;
   return res.json();
 }

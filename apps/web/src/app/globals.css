@@ -281,7 +281,57 @@ button, a, [role="button"] { min-height: 44px; }
 
 /* ── Mobile: hero section ───────────────────────────────────────────────────── */
 @media (max-width: 767px) {
-  /* The hero section now fills 100svh inline, so no override needed */
+  /* 60svh: shorter portrait box → less object-fit:cover crop → images appear
+     more zoomed-out. Text fits because content height (≈185px) is well within
+     the ~415px available after subtracting nav padding + bottom breathing room. */
+  .hero-section {
+    min-height: 60svh !important;
+    /* True flex centering — content sits in the vertical middle of the box */
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* Content block: top padding offsets the section's marginTop:-56px pull so
+     text always clears the fixed 44px mobile navbar. Bottom pad keeps the CTA
+     off the section edge. Flex column centres the stack within the padded area. */
+  .hero-content-inner {
+    padding-top: 56px !important;   /* 44px nav + 12px visual gap */
+    padding-bottom: 20px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+  }
+
+  /* h1: fluid between 24px (smallest phones) and 32px (phablets).
+     Tight line-height + small bottom margin keeps the stack compact. */
+  .hero-content-inner h1 {
+    font-size: clamp(24px, 7vw, 32px) !important;
+    line-height: 1.2 !important;
+    margin-bottom: 10px !important;
+    padding: 0 4px !important;
+  }
+
+  /* Subtext: readable but not oversized. 18px margin gives clean separation. */
+  .hero-content-inner p {
+    font-size: clamp(13px, 3.8vw, 15px) !important;
+    line-height: 1.55 !important;
+    margin-bottom: 18px !important;
+    padding: 0 4px !important;
+  }
+
+  /* CTA button: compact but still 44px+ touch target */
+  .hero-btn {
+    padding: 11px 28px !important;
+    font-size: 14px !important;
+    min-height: 44px !important;
+  }
+}
+
+@media (min-width: 768px) {
+  /* Desktop: restore full-viewport cinematic height.
+     Also keeps the inline style removal from page.tsx harmless on desktop. */
   .hero-section {
     min-height: 100svh;
   }

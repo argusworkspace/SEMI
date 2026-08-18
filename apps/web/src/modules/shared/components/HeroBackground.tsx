@@ -62,7 +62,7 @@ export default function HeroBackground() {
           sizes="100vw"
           style={{
             objectFit: "cover",
-            objectPosition: "center center",
+            objectPosition: "center 40%",
             opacity: i === index ? 1 : 0,
             transition: reducedMotion ? "none" : `opacity ${FADE_MS}ms ease`,
           }}

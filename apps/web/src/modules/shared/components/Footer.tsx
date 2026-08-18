@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
   COLOR_VOLT,
 } from "@/lib/design-tokens";
@@ -97,21 +98,8 @@ export default function Footer() {
           {/* ── Col 1: Brand blurb ──────────────────────────────────── */}
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-               <span
-                  aria-hidden="true"
-                  style={{
-                    width: 24, height: 24,
-                    background: "linear-gradient(135deg, #D4A843, #F0C060)",
-                    borderRadius: 4,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    flexShrink: 0,
-                    fontFamily: "var(--font-space-grotesk), sans-serif",
-                    fontSize: 12, fontWeight: 700,
-                    color: "#0F1B2D",
-                  }}
-                >
-                  S
-                </span>
+              <Image src="/images/logo-icon-white.png" alt="" aria-hidden="true" width={164} height={99}
+                style={{ height: 28, width: "auto", flexShrink: 0 }} />
               <p
                 style={{
                   fontFamily: "var(--font-space-grotesk), sans-serif",

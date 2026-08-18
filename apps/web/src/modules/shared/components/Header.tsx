@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { useCart } from "@/modules/shared/context/CartContext";
 
@@ -15,6 +17,19 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled]     = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+
+  // The browser only fires "hashchange" when the hash actually changes, so a
+  // plain <a href="#products"> silently does nothing if that section's hash
+  // is already active (e.g. clicked once already). Scroll directly when
+  // already on the home page; otherwise let the link navigate there normally.
+  function handleNavClick(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
+    if (pathname !== "/") return;
+    e.preventDefault();
+    const id = href.slice(1);
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    if (window.location.hash !== href) window.location.hash = id;
+  }
   const { totalItems, openDrawer } = useCart();
 
   useEffect(() => {
@@ -128,32 +143,16 @@ export default function Header() {
         }}
       >
         <div className="layout-container flex items-center justify-between header-inner" style={{ height: 56 }}>
-          {/* Wordmark */}
-          <Link href="/" aria-label="SEMY – home" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
-            <span
-              aria-hidden="true"
-              style={{
-                width: 24, height: 24,
-                background: "linear-gradient(135deg, #D4A843, #F0C060)",
-                borderRadius: 5,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                flexShrink: 0,
-                fontFamily: "var(--font-space-grotesk), sans-serif",
-                fontSize: 12, fontWeight: 700,
-                color: "#0F1B2D",
-              }}
-            >
-              S
-            </span>
-            <span style={{ fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 18, fontWeight: 700, color: "#FFFFFF", letterSpacing: "-0.01em" }}>
-              SEMY
-            </span>
+          {/* Logo */}
+          <Link href="/" aria-label="SEMY – home" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
+            <Image src="/images/logo-full-white.png" alt="SEMY — Urban Mobility, Reimagined" width={451} height={138} priority
+              style={{ height: 32, width: "auto" }} />
           </Link>
 
           {/* Desktop nav */}
           <nav aria-label="Primary navigation" className="hidden md:flex items-center gap-7">
             {NAV_LINKS.map((link) => (
-              <a key={link.href} href={link.href} className="nav-link">{link.label}</a>
+              <a key={link.href} href={link.href} onClick={(e) => handleNavClick(e, link.href)} className="nav-link">{link.label}</a>
             ))}
             <button className="header-cart-btn" id="header-cart-btn" onClick={openDrawer} aria-label={`Cart (${totalItems})`}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#EDE8E0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -226,7 +225,7 @@ export default function Header() {
             {NAV_LINKS.map((link) => (
               <a
                 key={link.href} href={link.href}
-                onClick={() => setMobileOpen(false)}
+                onClick={(e) => { setMobileOpen(false); handleNavClick(e, link.href); }}
                 className="mobile-link"
               >
                 {link.label}

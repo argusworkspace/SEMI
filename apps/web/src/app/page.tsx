@@ -63,7 +63,15 @@ export default function Home() {
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
 
-  const scrollToProducts = () => { window.location.hash = "products"; };
+  // Scroll directly rather than relying on the "hashchange" event — the browser
+  // only fires that event when the hash actually changes, so this silently did
+  // nothing if the hash was already "#products" (e.g. clicked once already, or
+  // arrived via a #products link).
+  function scrollToProducts() {
+    setActiveSection("products");
+    document.getElementById("products")?.scrollIntoView({ behavior: "smooth" });
+    if (window.location.hash !== "#products") window.location.hash = "products";
+  }
 
   return (
     <>

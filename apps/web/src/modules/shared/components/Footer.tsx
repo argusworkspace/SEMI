@@ -154,8 +154,8 @@ export default function Footer() {
           <div>
             <ColHeading>Contact</ColHeading>
             <FooterLink href="tel:+917358110762">+91 73581 10762</FooterLink>
-            <FooterLink href="mailto:hello@semy.in" external>
-              hello@semy.in
+            <FooterLink href="mailto:semy.office@gmail.com" external>
+              semy.office@gmail.com
             </FooterLink>
             <FooterLink href="https://wa.me/917358110762" external>
               WhatsApp Us ↗

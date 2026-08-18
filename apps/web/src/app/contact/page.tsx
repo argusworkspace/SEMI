@@ -114,7 +114,7 @@ export default function ContactPage() {
 
           {/* Email */}
           <a
-            href="mailto:hello@semy.in"
+            href="mailto:semy.office@gmail.com"
             style={{
               backgroundColor: "#FFFFFF",
               border: `1px solid ${COLOR_HAIRLINE}`,
@@ -154,7 +154,7 @@ export default function ContactPage() {
                 marginBottom: 8,
               }}
             >
-              hello@semy.in
+              semy.office@gmail.com
             </div>
             <div
               style={{

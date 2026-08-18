@@ -289,7 +289,7 @@ export default function Home() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(280px, 100%), 1fr))", gap: 16, maxWidth: "1000px", margin: "0 auto" }}>
             {[
               { label: "Phone", value: "+91 73581 10762", href: "tel:+917358110762", note: "Mon–Sat, 9 AM – 6 PM IST" },
-              { label: "Email", value: "hello@semy.in", href: "mailto:hello@semy.in", note: "We'll respond within 24 hours" },
+              { label: "Email", value: "semy.office@gmail.com", href: "mailto:semy.office@gmail.com", note: "We'll respond within 24 hours" },
               { label: "WhatsApp", value: "Message Us ↗", href: "https://wa.me/917358110762", note: "Quick replies during business hours", external: true },
             ].map((contact) => (
               <a

@@ -27,6 +27,12 @@ const ACHIEVEMENTS = [
     caption: "One of our riders with his SEMY — built tough, ridden daily.",
   },
   {
+    image: "/images/acheivements/raj.jpeg",
+    title: "Recognized by Raj Madhuram, Co-Founder & CTO of C1X Inc",
+    caption:
+      "SEMY was showcased to Raj Madhuram, Co-Founder & CTO of C1X Inc, as an innovative electric mobility solution bringing sustainable transportation to the community.",
+  },
+  {
     image: "/images/acheivements/iskcon-swami.jpeg",
     title: "Presented to HH BHAKTI VINOD SWAMI, ISKCON LEADER",
     caption: "Presented to HH BHAKTI VINOD SWAMI, ISKCON LEADER",

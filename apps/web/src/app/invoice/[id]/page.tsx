@@ -54,7 +54,7 @@ function orderSeqNum(orderNumber: string): string {
   return match ? String(parseInt(match[1], 10)) : (orderNumber ?? "—");
 }
 
-const td: React.CSSProperties = { border: "1px solid #000", padding: "4px 6px", fontSize: 11 };
+const td: React.CSSProperties = { border: "1px solid #000", padding: "3px 5px", fontSize: 10 };
 const tdR: React.CSSProperties = { ...td, textAlign: "right" };
 const tdC: React.CSSProperties = { ...td, textAlign: "center" };
 const th: React.CSSProperties = { ...td, fontWeight: 700, backgroundColor: "#f5f5f5" };
@@ -82,64 +82,65 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
         @media print {
           .no-print { display: none !important; }
           body { margin: 0; }
+          .inv-card, .inv-card table { page-break-inside: avoid; }
         }
-        @page { size: A4; margin: 8mm; }
+        @page { size: A4; margin: 6mm; }
       `}</style>
 
       {/* ── Invoice ── */}
       <div style={{ maxWidth: 800, margin: "0 auto", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
-      <div style={{ minWidth: 620, border: "2px solid #000", fontFamily: "Arial, sans-serif" }}>
+      <div className="inv-card" style={{ minWidth: 620, border: "2px solid #000", fontFamily: "Arial, sans-serif" }}>
 
         {/* Title */}
-        <div style={{ textAlign: "center", borderBottom: "1px solid #000", padding: "6px 0" }}>
-          <strong style={{ fontSize: 14, letterSpacing: "0.05em" }}>Tax Invoice</strong>
+        <div style={{ textAlign: "center", borderBottom: "1px solid #000", padding: "4px 0" }}>
+          <strong style={{ fontSize: 13, letterSpacing: "0.05em" }}>Tax Invoice</strong>
         </div>
 
         {/* Top two-column block */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: "1px solid #000" }}>
 
           {/* Left — Seller */}
-          <div style={{ borderRight: "1px solid #000", padding: "8px 10px" }}>
-            <div style={{ fontWeight: 700, fontSize: 13 }}>{inv.seller_name}</div>
+          <div style={{ borderRight: "1px solid #000", padding: "6px 8px" }}>
+            <div style={{ fontWeight: 700, fontSize: 12 }}>{inv.seller_name}</div>
             {inv.seller_trade_name && inv.seller_trade_name !== inv.seller_name && (
-              <div style={{ fontSize: 11, color: "#444" }}>{inv.seller_trade_name}</div>
+              <div style={{ fontSize: 10, color: "#444" }}>{inv.seller_trade_name}</div>
             )}
             {inv.seller_address && (
-              <div style={{ fontSize: 11, marginTop: 2, whiteSpace: "pre-line" }}>{inv.seller_address}</div>
+              <div style={{ fontSize: 10, marginTop: 2, whiteSpace: "pre-line" }}>{inv.seller_address}</div>
             )}
             {inv.seller_gstin && (
-              <div style={{ fontSize: 11, marginTop: 4 }}>
+              <div style={{ fontSize: 10, marginTop: 3 }}>
                 <strong>GSTIN/UIN</strong> : {inv.seller_gstin}
               </div>
             )}
-            <div style={{ fontSize: 11, marginTop: 2 }}>
+            <div style={{ fontSize: 10, marginTop: 2 }}>
               <strong>State Name</strong> : {inv.seller_state || "Tamil Nadu"}, Code : {inv.seller_state_code || "33"}
             </div>
             {inv.seller_email && (
-              <div style={{ fontSize: 11, marginTop: 2 }}>
+              <div style={{ fontSize: 10, marginTop: 2 }}>
                 <strong>E-Mail</strong> : {inv.seller_email}
               </div>
             )}
 
             {/* Buyer */}
-            <div style={{ marginTop: 12, borderTop: "1px solid #ccc", paddingTop: 8 }}>
-              <div style={{ fontSize: 11, color: "#666", marginBottom: 2 }}>Buyer (Bill to)</div>
-              <div style={{ fontWeight: 700, fontSize: 12 }}>{inv.buyer_name}</div>
-              <div style={{ fontSize: 11, whiteSpace: "pre-line" }}>{inv.buyer_address}</div>
-              <div style={{ fontSize: 11 }}>{inv.buyer_district} — {inv.buyer_pin}</div>
+            <div style={{ marginTop: 8, borderTop: "1px solid #ccc", paddingTop: 6 }}>
+              <div style={{ fontSize: 10, color: "#666", marginBottom: 2 }}>Buyer (Bill to)</div>
+              <div style={{ fontWeight: 700, fontSize: 11 }}>{inv.buyer_name}</div>
+              <div style={{ fontSize: 10, whiteSpace: "pre-line" }}>{inv.buyer_address}</div>
+              <div style={{ fontSize: 10 }}>{inv.buyer_district} — {inv.buyer_pin}</div>
               {inv.buyer_gstin && (
-                <div style={{ fontSize: 11, marginTop: 2 }}>
+                <div style={{ fontSize: 10, marginTop: 2 }}>
                   <strong>GSTIN/UIN</strong> : {inv.buyer_gstin}
                 </div>
               )}
-              <div style={{ fontSize: 11, marginTop: 2 }}>
+              <div style={{ fontSize: 10, marginTop: 2 }}>
                 <strong>State Name</strong> : {inv.buyer_state}
               </div>
             </div>
           </div>
 
           {/* Right — Invoice meta */}
-          <div style={{ padding: "8px 10px", fontSize: 11 }}>
+          <div style={{ padding: "6px 8px", fontSize: 10 }}>
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <tbody>
                 {[
@@ -150,8 +151,8 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
                   ["Buyer's Order No.", orderSeqNum(inv.order_number)],
                 ].map(([label, value]) => (
                   <tr key={label}>
-                    <td style={{ padding: "3px 0", color: "#555", width: "50%" }}>{label}</td>
-                    <td style={{ padding: "3px 0", fontWeight: label === "Invoice No." ? 700 : 400 }}>{value}</td>
+                    <td style={{ padding: "2px 0", color: "#555", width: "50%" }}>{label}</td>
+                    <td style={{ padding: "2px 0", fontWeight: label === "Invoice No." ? 700 : 400 }}>{value}</td>
                   </tr>
                 ))}
               </tbody>
@@ -179,11 +180,11 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
                 <div style={{ fontWeight: 600 }}>
                   {inv.product_name}{inv.color ? ` — ${inv.color}` : ""}
                 </div>
-                <div style={{ fontSize: 10, color: "#555", marginTop: 2 }}>
+                <div style={{ fontSize: 9, color: "#555", marginTop: 1 }}>
                   Advance against pre-order · Delivery Note No. {orderSeqNum(inv.order_number)}
                 </div>
                 {inv.upi_transaction_id && (
-                  <div style={{ fontSize: 10, color: "#555" }}>
+                  <div style={{ fontSize: 9, color: "#555" }}>
                     UPI Ref: {inv.upi_transaction_id}
                     {inv.upi_date ? ` · ${inv.upi_date}` : ""}
                     {inv.upi_time ? ` ${inv.upi_time}` : ""}
@@ -197,8 +198,8 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
               <td style={tdR}>{fmtNum(inv.taxable_value)}</td>
             </tr>
             {/* Padding rows */}
-            {[...Array(2)].map((_, i) => (
-              <tr key={i} style={{ height: 18 }}>
+            {[...Array(1)].map((_, i) => (
+              <tr key={i} style={{ height: 12 }}>
                 <td style={td} />
                 <td style={td} />
                 <td style={td} />
@@ -239,15 +240,15 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
         </table>
 
         {/* Amount in words */}
-        <div style={{ borderBottom: "1px solid #000", padding: "6px 10px", fontSize: 11 }}>
+        <div style={{ borderBottom: "1px solid #000", padding: "4px 8px", fontSize: 10 }}>
           <span style={{ color: "#555" }}>Amount Chargeable (in words)</span>
           <br />
           <strong>{amountInWords(totalGross)}</strong>
-          <span style={{ float: "right", fontSize: 10 }}>E. &amp; O.E</span>
+          <span style={{ float: "right", fontSize: 9 }}>E. &amp; O.E</span>
         </div>
 
         {/* Tax summary table */}
-        <table style={{ width: "100%", borderCollapse: "collapse", borderBottom: "1px solid #000", fontSize: 11 }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", borderBottom: "1px solid #000", fontSize: 10 }}>
           <thead>
             <tr>
               <th style={th} rowSpan={2}>HSN/SAC</th>
@@ -286,30 +287,30 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
         </table>
 
         {/* Tax amount in words */}
-        <div style={{ borderBottom: "1px solid #000", padding: "6px 10px", fontSize: 11 }}>
+        <div style={{ borderBottom: "1px solid #000", padding: "4px 8px", fontSize: 10 }}>
           <strong>Tax Amount (in words) : </strong>
           {amountInWords(cgst + sgst)}
         </div>
 
         {/* Footer: Bank details + Declaration + Signature */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", fontSize: 11 }}>
-          <div style={{ borderRight: "1px solid #000", padding: "8px 10px" }}>
-            <div style={{ fontWeight: 600, marginBottom: 4 }}>Declaration</div>
-            <div style={{ fontSize: 10, color: "#555", lineHeight: "16px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", fontSize: 10 }}>
+          <div style={{ borderRight: "1px solid #000", padding: "6px 8px" }}>
+            <div style={{ fontWeight: 600, marginBottom: 3 }}>Declaration</div>
+            <div style={{ fontSize: 9, color: "#555", lineHeight: "13px" }}>
               We declare that this invoice shows the actual price of the goods described
               and that all particulars are true and correct.
             </div>
-            <div style={{ marginTop: 12 }}>
-              <div style={{ borderTop: "1px solid #999", display: "inline-block", width: 120, marginTop: 12 }} />
-              <div style={{ fontSize: 10, color: "#777" }}>Customer&apos;s Seal and Signature</div>
+            <div style={{ marginTop: 8 }}>
+              <div style={{ borderTop: "1px solid #999", display: "inline-block", width: 110, marginTop: 8 }} />
+              <div style={{ fontSize: 9, color: "#777" }}>Customer&apos;s Seal and Signature</div>
             </div>
           </div>
 
-          <div style={{ padding: "8px 10px" }}>
+          <div style={{ padding: "6px 8px" }}>
             {(inv.seller_bank_name || inv.seller_bank_account) && (
               <>
-                <div style={{ fontWeight: 600, marginBottom: 6 }}>Company&apos;s Bank Details</div>
-                <table style={{ fontSize: 11 }}>
+                <div style={{ fontWeight: 600, marginBottom: 4 }}>Company&apos;s Bank Details</div>
+                <table style={{ fontSize: 10 }}>
                   <tbody>
                     {inv.seller_bank_name && (
                       <tr><td style={{ color: "#555", paddingRight: 8 }}>Bank Name</td><td>: {inv.seller_bank_name}</td></tr>
@@ -327,17 +328,17 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
                 </table>
               </>
             )}
-            <div style={{ textAlign: "right", marginTop: 12 }}>
-              <div style={{ fontWeight: 600, fontSize: 12 }}>for {inv.seller_name}</div>
-              <div style={{ height: 26 }} />
-              <div style={{ borderTop: "1px solid #999", display: "inline-block", width: 120 }} />
-              <div style={{ fontSize: 10, color: "#777" }}>Authorised Signatory</div>
+            <div style={{ textAlign: "right", marginTop: 8 }}>
+              <div style={{ fontWeight: 600, fontSize: 11 }}>for {inv.seller_name}</div>
+              <div style={{ height: 16 }} />
+              <div style={{ borderTop: "1px solid #999", display: "inline-block", width: 110 }} />
+              <div style={{ fontSize: 9, color: "#777" }}>Authorised Signatory</div>
             </div>
           </div>
         </div>
 
         {/* Footer note */}
-        <div style={{ borderTop: "1px solid #000", padding: "4px 10px", textAlign: "center", fontSize: 10, color: "#555" }}>
+        <div style={{ borderTop: "1px solid #000", padding: "3px 8px", textAlign: "center", fontSize: 9, color: "#555" }}>
           This is a Computer Generated Invoice
         </div>
       </div>

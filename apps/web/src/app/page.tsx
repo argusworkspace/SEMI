@@ -26,6 +26,11 @@ const ACHIEVEMENTS = [
     title: "Riders Love It",
     caption: "One of our riders with his SEMY — built tough, ridden daily.",
   },
+  {
+    image: "/images/acheivements/iskcon-swami.jpeg",
+    title: "Presented to HH BHAKTI VINOD SWAMI, ISKCON LEADER",
+    caption: "Presented to HH BHAKTI VINOD SWAMI, ISKCON LEADER",
+  },
 ];
 
 export default function Home() {
@@ -158,6 +163,8 @@ export default function Home() {
             position: "absolute", inset: 0,
             width: "100%", height: "100%",
             objectFit: "cover",
+            // Center the subject on all screen sizes including portrait mobile
+            objectPosition: "center center",
             zIndex: 0,
           }}
         />
@@ -171,7 +178,8 @@ export default function Home() {
           style={{
             position: "absolute", inset: 0,
             backgroundColor: "rgba(15, 27, 45, 0.70)",
-            zIndex: 1,
+            // z-index 2: above the poster (0) and the desktop video (1)
+            zIndex: 2,
             pointerEvents: "none",
           }}
         />

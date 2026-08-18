@@ -279,8 +279,9 @@ export default function Home() {
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(280px, 100%), 1fr))", gap: 16, maxWidth: "1000px", margin: "0 auto" }}>
           {[
-            { label: "Mission", title: "Accessible Electric Mobility", description: "Make electric two-wheelers affordable, reliable, and practical for every Indian commuter." },
-            { label: "Vision", title: "Cleaner, Smarter Cities", description: "Lead India's transition to sustainable urban transport through innovation and quality." },
+            { label: "Vision", title: "Leading Sustainable Urban Commuting", description: "We aim to redefine how campuses and cities move, replacing outdated, polluting transport with smart, people-friendly, eco-conscious solutions — one responsible ride at a time." },
+            { label: "Mission", title: "Empowering Smart, Sustainable Mobility", description: "We empower communities with innovative electric & pedal-powered cycles offering safe, smart, sustainable mobility — designed for campus and short-distance travel, accessible and affordable for everyone." },
+            { label: "SEMY", title: "Reconnect With Your Childhood", description: "Every journey begins with a bicycle — a timeless companion of childhood carrying joy, freedom, and memories. Ride with us and reconnect with the spirit of your childhood." },
             { label: "Values", title: "Built to Last", description: "Honest pricing, customer-first service, and products designed for durability. Made in India 🇮🇳" },
           ].map((item) => (
             <div key={item.label} className="about-card">

@@ -207,7 +207,6 @@ export default function Home() {
             }}
           >
             Electric bikes built for power, range, and everyday reliability.
-            Book yours with just ₹5,000 advance.
           </p>
           <button onClick={scrollToProducts} className="hero-btn" style={{ width: "auto", maxWidth: "100%" }}>
             Explore Our Bikes

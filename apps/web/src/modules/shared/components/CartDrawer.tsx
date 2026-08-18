@@ -1,16 +1,22 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useCart } from "@/modules/shared/context/CartContext";
+import type { Product } from "@/types/product";
+import PayAdvanceModal from "@/modules/products/components/PayAdvanceModal";
+import { useBodyScrollLock } from "@/modules/shared/hooks/useBodyScrollLock";
 
 function fmt(n: number) { return "₹" + n.toLocaleString("en-IN"); }
 function colorName(hex: string) {
   return ({ "#FFFFFF": "Pearl White", "#3B82F6": "Ocean Blue", "#EAB308": "Solar Yellow", "#374151": "Charcoal Grey" } as Record<string, string>)[hex.toUpperCase()] ?? hex;
 }
 
+const ADVANCE_PER_ITEM = 5000;
+
 export default function CartDrawer() {
-  const { items, totalItems, totalAmount, totalAdvance, isDrawerOpen, closeDrawer, removeFromCart, updateQuantity, clearCart } = useCart();
+  const { items, totalItems, totalAmount, isDrawerOpen, closeDrawer, removeFromCart, updateQuantity, clearCart } = useCart();
   const drawerRef = useRef<HTMLDivElement>(null);
+  const [bookingProduct, setBookingProduct] = useState<Product | null>(null);
 
   useEffect(() => {
     if (!isDrawerOpen) return;
@@ -19,14 +25,17 @@ export default function CartDrawer() {
     return () => window.removeEventListener("keydown", onKey);
   }, [isDrawerOpen, closeDrawer]);
 
-  useEffect(() => {
-    if (isDrawerOpen) {
-      document.body.style.overflow = "hidden";
-      return () => { document.body.style.overflow = ""; };
-    }
-  }, [isDrawerOpen]);
+  useBodyScrollLock(isDrawerOpen);
 
 
+  const totalUnits = items.reduce((s, i) => s + i.quantity, 0);
+  const totalAdvance = totalUnits * ADVANCE_PER_ITEM;
+
+  function handleCheckout() {
+    if (items.length === 0) return;
+    closeDrawer();
+    setBookingProduct(items[0].product);
+  }
 
   return (
     <>
@@ -141,7 +150,7 @@ export default function CartDrawer() {
             ) : (
               <>
                 {/* Items */}
-                <div style={{ flex: 1, overflowY: "auto", padding: "6px 16px", WebkitOverflowScrolling: "touch" }}>
+                <div style={{ flex: 1, overflowY: "auto", padding: "6px 16px", WebkitOverflowScrolling: "touch", overscrollBehavior: "contain" }}>
                   {items.map((item) => (
                     <div key={`${item.product.id}-${item.selectedColor}`} className="cd-item">
                       <div style={{ width: 64, height: 64, flexShrink: 0, background: "linear-gradient(145deg,#F0ECE5,#E8E2D8)", borderRadius: 8, border: "1px solid #E2DDD6", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
@@ -179,13 +188,24 @@ export default function CartDrawer() {
                     <span style={{ fontFamily: "var(--font-inter), sans-serif", fontSize: 12, color: "#8896A5" }}>Total Cycle Price</span>
                     <span style={{ fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 13, fontWeight: 600, color: "#162033" }}>{fmt(totalAmount)}</span>
                   </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
+                    <span style={{ fontFamily: "var(--font-inter), sans-serif", fontSize: 12, color: "#8896A5" }}>Advance per bike</span>
+                    <span style={{ fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 13, fontWeight: 600, color: "#162033" }}>₹5,000</span>
+                  </div>
+                  {totalUnits > 1 && (
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
+                      <span style={{ fontFamily: "var(--font-inter), sans-serif", fontSize: 12, color: "#8896A5" }}>× {totalUnits} bikes</span>
+                      <span style={{ fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 13, fontWeight: 600, color: "#8896A5" }}>{fmt(totalAdvance)}</span>
+                    </div>
+                  )}
                   <div style={{ borderTop: "1px dashed #E2DDD6", margin: "8px 0 12px" }} />
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 14 }}>
-                    <span style={{ fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 14, fontWeight: 700, color: "#0F1B2D" }}>Advance Payable</span>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 4 }}>
+                    <span style={{ fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 14, fontWeight: 700, color: "#0F1B2D" }}>Pay now</span>
                     <span style={{ fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 22, fontWeight: 700, color: "#D4A843" }}>{fmt(totalAdvance)}</span>
                   </div>
-                  <button id="cart-checkout-btn" className="cd-checkout-btn" onClick={() => alert(`Cashfree payment integration coming soon!\n\nItems: ${totalItems}\nAdvance Payable: ${fmt(totalAdvance)}`)}>
-                    Proceed to Preorder — {fmt(totalAdvance)}
+                  <p style={{ fontFamily: "var(--font-inter), sans-serif", fontSize: 11, color: "#8896A5", margin: "0 0 12px" }}>Balance payable on delivery</p>
+                  <button id="cart-checkout-btn" className="cd-checkout-btn" onClick={handleCheckout}>
+                    Book with {fmt(totalAdvance)} Advance
                   </button>
                   <button className="cd-clear-btn" onClick={clearCart}>Clear Cart</button>
                 </div>
@@ -193,6 +213,14 @@ export default function CartDrawer() {
             )}
           </div>
         </>
+      )}
+
+      {bookingProduct && (
+        <PayAdvanceModal
+          product={bookingProduct}
+          onClose={() => setBookingProduct(null)}
+          onPaid={() => removeFromCart(bookingProduct.id)}
+        />
       )}
     </>
   );

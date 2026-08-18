@@ -21,6 +21,8 @@
 
 /* ── CSS Custom Properties ──────────────────────────────────────────────────── */
 :root {
+  --font-space-grotesk: 'Space Grotesk', sans-serif;
+  --font-inter: 'Inter', sans-serif;
   --navy:          #0F1B2D;
   --navy-mid:      #162033;
   --navy-card:     #1E2E45;
@@ -311,6 +313,21 @@ button, a, [role="button"] { min-height: 44px; }
     max-width: 100vw !important;
     width: 100vw !important;
     border-left: none !important;
+  }
+}
+
+/* ── Print: hide site chrome everywhere (nav, footer, floating cart, drawer) ─── */
+@media print {
+  header,
+  footer,
+  .fc-btn,
+  .cd-overlay,
+  .cd-panel {
+    display: none !important;
+  }
+
+  body {
+    overflow: visible !important;
   }
 }
 

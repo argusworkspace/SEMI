@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "crypto";
-
-const API_URL = process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+import { internalFetch } from "@/lib/api/server";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -18,22 +17,26 @@ export async function POST(req: NextRequest) {
     city,
   } = body;
 
-  const res = await fetch(`${API_URL}/orders`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      idempotency_key: idempotencyKey ?? randomUUID(),
-      product_id: productId,
-      product_name: productName,
-      color: color ?? null,
-      unit_price: unitPrice,
-      customer_name: customerName,
-      customer_email: email ?? `${phone}@semy.in`,
-      customer_phone: phone,
-      delivery_pincode: null,
-      notes: city ? `City: ${city}` : null,
-    }),
-  });
+  const res = await internalFetch(
+    `/orders`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        idempotency_key: idempotencyKey ?? randomUUID(),
+        product_id: productId,
+        product_name: productName,
+        color: color ?? null,
+        unit_price: unitPrice,
+        customer_name: customerName,
+        customer_email: email ?? `${phone}@semy.in`,
+        customer_phone: phone,
+        delivery_pincode: null,
+        notes: city ? `City: ${city}` : null,
+      }),
+    },
+    req.nextUrl.origin
+  );
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: "Gateway error" }));

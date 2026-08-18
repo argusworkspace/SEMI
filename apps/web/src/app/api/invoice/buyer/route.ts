@@ -1,27 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
-
-const API_URL =
-  process.env.API_URL ??
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ??
-  process.env.NEXT_PUBLIC_API_URL ??
-  "http://localhost:8000";
+import { internalFetch } from "@/lib/api/server";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
 
-  const res = await fetch(`${API_URL}/invoices`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      order_id: body.orderId,
-      name: body.name,
-      address: body.address,
-      district: body.district,
-      pin: body.pin,
-      state: body.state,
-      gstin: body.gstin || null,
-    }),
-  });
+  const res = await internalFetch(
+    `/invoices`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        order_id: body.orderId,
+        name: body.name,
+        address: body.address,
+        district: body.district,
+        pin: body.pin,
+        state: body.state,
+        gstin: body.gstin || null,
+      }),
+    },
+    req.nextUrl.origin
+  );
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: "Failed to create invoice" }));

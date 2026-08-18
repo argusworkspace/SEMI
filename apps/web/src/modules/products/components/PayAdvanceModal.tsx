@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Product } from "@/types/product";
 import { createOrder, submitPaymentProof, type OcrCheck } from "@/lib/api/payments";
+import { useBodyScrollLock } from "@/modules/shared/hooks/useBodyScrollLock";
 import {
   COLOR_AMBER,
   COLOR_ASPHALT,
@@ -209,11 +210,17 @@ function PriceRow({ label, value, note, bold, accent, muted }: {
 }
 
 // ── Step 2: Payment Instructions ──────────────────────────────────────────────
-const UPI_APPS = [
-  { id: "gpay",    name: "GPay",    bg: "#1a73e8", label: "G",  scheme: "tez://upi/pay" },
-  { id: "phonepe", name: "PhonePe", bg: "#5f259f", label: "Pe", scheme: "phonepe://pay" },
-  { id: "paytm",   name: "Paytm",   bg: "#00BAF2", label: "Pt", scheme: "paytmmp://upi/pay" },
-  { id: "upi",     name: "Any UPI", bg: "#F97316", label: "₹",  scheme: "upi://pay" },
+// A upi://pay deep link, opened from a website, has been confirmed to be
+// actively REFUSED by GPay, PhonePe, and Paytm (not just extra friction —
+// tested and failed on all three), while a plain "send to UPI ID" inside the
+// app itself goes through fine. Those apps' fraud models specifically target
+// externally-injected payment intents (that's also the shape of QR/link
+// payment scams); typing/pasting the UPI ID yourself is a different, trusted
+// code path. So the manual flow is the primary — and only — path here.
+const TRUST_LOGOS = [
+  { id: "gpay", name: "GPay", src: "/images/upi/gpay.svg" },
+  { id: "phonepe", name: "PhonePe", src: "/images/upi/phonepe.svg" },
+  { id: "paytm", name: "Paytm", src: "/images/upi/paytm.svg" },
 ];
 
 function PaymentStep({
@@ -233,14 +240,6 @@ function PaymentStep({
       .catch(() => {});
   }, []);
 
-  const upiParams = new URLSearchParams({
-    pa: upiId,
-    pn: upiName,
-    am: String(advanceAmount),
-    cu: "INR",
-    tn: `SEMY ${order.orderNumber}`,
-  }).toString();
-
   function copyUpi() {
     navigator.clipboard.writeText(upiId).then(() => {
       setCopied(true);
@@ -250,65 +249,44 @@ function PaymentStep({
 
   return (
     <div>
-      <p style={{ fontSize: 14, color: COLOR_STEEL, marginBottom: 20, fontFamily: "var(--font-inter), sans-serif", lineHeight: "20px" }}>
-        Tap your UPI app to pay exactly{" "}
-        <strong style={{ color: COLOR_ASPHALT }}>{fmt(advanceAmount)}</strong>.
-        After paying, take a screenshot and upload it in the next step.
+      <p style={{ fontSize: 14, color: COLOR_STEEL, marginBottom: 16, fontFamily: "var(--font-inter), sans-serif", lineHeight: "20px" }}>
+        Pay exactly <strong style={{ color: COLOR_ASPHALT }}>{fmt(advanceAmount)}</strong> to
+        the UPI ID below from any UPI app. After paying, take a screenshot and upload it in the next step.
       </p>
 
-      {/* UPI App buttons */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 24 }}>
-        {UPI_APPS.map((app) => (
-          <a
-            key={app.id}
-            href={`${app.scheme}?${upiParams}`}
-            style={{ textDecoration: "none", textAlign: "center" }}
-          >
-            <div style={{
-              width: "100%", aspectRatio: "1 / 1", borderRadius: 16,
-              backgroundColor: app.bg,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              marginBottom: 6, fontSize: 20, fontWeight: 700, color: "#fff",
-              fontFamily: "var(--font-space-grotesk), sans-serif",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
-            }}>
-              {app.label}
-            </div>
-            <span style={{
-              fontSize: 11, color: COLOR_ASPHALT, fontWeight: 500,
-              fontFamily: "var(--font-inter), sans-serif", display: "block",
-            }}>
-              {app.name}
-            </span>
-          </a>
+      {/* Recognition strip: small app marks, not links */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 18 }}>
+        <span style={{ fontSize: 11, color: COLOR_STEEL, fontFamily: "var(--font-inter), sans-serif" }}>Works with</span>
+        {TRUST_LOGOS.map((logo) => (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img key={logo.id} src={logo.src} alt={logo.name} width={20} height={20}
+            style={{ borderRadius: "50%", boxShadow: "0 0 0 1px rgba(0,0,0,0.06)" }} />
         ))}
       </div>
 
-      {/* Divider */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-        <div style={{ flex: 1, height: 1, backgroundColor: COLOR_HAIRLINE }} />
-        <span style={{ fontSize: 11, color: COLOR_STEEL, fontFamily: "var(--font-inter), sans-serif", textTransform: "uppercase", letterSpacing: "0.08em", whiteSpace: "nowrap" }}>
-          or pay manually
-        </span>
-        <div style={{ flex: 1, height: 1, backgroundColor: COLOR_HAIRLINE }} />
-      </div>
-
-      {/* UPI ID copy */}
-      <div style={{ border: `1px solid ${COLOR_HAIRLINE}`, borderRadius: 2, padding: "12px 14px", marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      {/* UPI ID — primary payment path */}
+      <div style={{ border: `1.5px solid ${COLOR_ASPHALT}`, borderRadius: 2, padding: "14px", marginBottom: 14, display: "flex", alignItems: "center", justifyContent: "space-between", backgroundColor: "rgba(200,241,53,0.08)" }}>
         <div>
-          <span style={{ fontSize: 11, color: COLOR_STEEL, display: "block", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 2, fontFamily: "var(--font-inter), sans-serif" }}>UPI ID</span>
-          <span style={{ fontSize: 15, fontWeight: 600, color: COLOR_ASPHALT, fontFamily: "var(--font-space-grotesk), sans-serif" }}>{upiId}</span>
+          <span style={{ fontSize: 11, color: COLOR_STEEL, display: "block", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 2, fontFamily: "var(--font-inter), sans-serif" }}>Pay to UPI ID</span>
+          <span style={{ fontSize: 17, fontWeight: 700, color: COLOR_ASPHALT, fontFamily: "var(--font-space-grotesk), sans-serif" }}>{upiId}</span>
         </div>
         <button onClick={copyUpi} style={{
-          padding: "6px 14px", fontSize: 12, fontWeight: 600,
-          backgroundColor: copied ? "#dcfce7" : COLOR_PAPER,
-          color: copied ? "#16a34a" : COLOR_STEEL,
-          border: `1px solid ${COLOR_HAIRLINE}`, borderRadius: 2, cursor: "pointer",
+          padding: "8px 16px", fontSize: 12, fontWeight: 600,
+          backgroundColor: copied ? "#dcfce7" : COLOR_ASPHALT,
+          color: copied ? "#16a34a" : COLOR_PAPER,
+          border: "none", borderRadius: 2, cursor: "pointer",
           fontFamily: "var(--font-inter), sans-serif", flexShrink: 0,
         }}>
-          {copied ? "Copied!" : "Copy"}
+          {copied ? "Copied!" : "Copy ID"}
         </button>
       </div>
+
+      {/* How-to steps */}
+      <ol style={{ margin: "0 0 16px", paddingLeft: 20, fontSize: 13, color: COLOR_STEEL, lineHeight: "22px", fontFamily: "var(--font-inter), sans-serif" }}>
+        <li>Open your UPI app (GPay, PhonePe, Paytm, Navi, BHIM…)</li>
+        <li>Tap <strong style={{ color: COLOR_ASPHALT }}>Pay</strong> / <strong style={{ color: COLOR_ASPHALT }}>Send</strong> → <strong style={{ color: COLOR_ASPHALT }}>To UPI ID / Bank Transfer</strong></li>
+        <li>Paste the UPI ID above and enter <strong style={{ color: COLOR_ASPHALT }}>{fmt(advanceAmount)}</strong></li>
+      </ol>
 
       {/* Order ref */}
       <div style={{ padding: "8px 14px", backgroundColor: COLOR_PAPER, border: `1px solid ${COLOR_HAIRLINE}`, borderRadius: 2, marginBottom: 20 }}>
@@ -574,9 +552,11 @@ function DoneStep({ order, ocr, invoiceId, onClose }: {
 export default function PayAdvanceModal({
   product,
   onClose,
+  onPaid,
 }: {
   product: Product;
   onClose: () => void;
+  onPaid?: () => void;
 }) {
   const router = useRouter();
   const [step, setStep] = useState<Step>("details");
@@ -605,11 +585,7 @@ export default function PayAdvanceModal({
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose, step]);
 
-  useEffect(() => {
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = prev; };
-  }, []);
+  useBodyScrollLock(true);
 
   function set(field: keyof FormValues, value: string) {
     setForm((f) => ({ ...f, [field]: value }));
@@ -648,6 +624,7 @@ export default function PayAdvanceModal({
   }
 
   function handleUploadDone(ocrResult: OcrCheck, newInvoiceId: string | null) {
+    onPaid?.();
     setOcr(ocrResult);
     setInvoiceId(newInvoiceId);
     if (newInvoiceId) {
@@ -673,10 +650,10 @@ export default function PayAdvanceModal({
     <>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
+        .modal-body { -webkit-overflow-scrolling: touch; }
         @media (max-width: 640px) {
           .modal-panel { max-width:100%!important; max-height:100vh!important; height:100vh!important; border-radius:0!important; border:none!important; }
           .modal-overlay { padding:0!important; }
-          .modal-body { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; }
           .modal-form-actions { position:sticky; bottom:0; background:#fff; padding:16px 20px!important; border-top:1px solid ${COLOR_HAIRLINE}; margin:0 -20px -24px -20px; }
         }
       `}</style>
@@ -688,10 +665,11 @@ export default function PayAdvanceModal({
 
         <div className="modal-panel" style={{
           backgroundColor: "#FFFFFF", width: "100%", maxWidth: 480,
-          maxHeight: "90vh", overflowY: "auto", borderRadius: 2,
+          maxHeight: "90vh", overflow: "hidden", borderRadius: 2,
           border: `1px solid ${COLOR_HAIRLINE}`, display: "flex", flexDirection: "column",
         }}>
-          {/* Header */}
+          {/* Header — flexShrink:0 keeps this fixed; only .modal-body below scrolls,
+              so the product name, advance amount, and close button never clip mid-scroll */}
           <div style={{ backgroundColor: COLOR_ASPHALT, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <div style={{ width: 48, height: 48, borderRadius: 2, border: "1px solid rgba(255,255,255,0.12)", backgroundColor: "rgba(255,255,255,0.06)", overflow: "hidden", flexShrink: 0 }}>
@@ -709,8 +687,8 @@ export default function PayAdvanceModal({
             </button>
           </div>
 
-          {/* Body */}
-          <div className="modal-body" style={{ padding: "24px 20px" }}>
+          {/* Body — the only scrollable region in the modal */}
+          <div className="modal-body" style={{ padding: "24px 20px", flex: 1, overflowY: "auto", overscrollBehavior: "contain" }}>
             <StepIndicator current={step} />
 
             {/* Price breakdown (always visible) */}

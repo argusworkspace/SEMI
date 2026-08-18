@@ -1,9 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { internalFetch } from "@/lib/api/server";
 
-const API_URL = process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
-
-export async function GET() {
-  const res = await fetch(`${API_URL}/orders/config`, { next: { revalidate: 300 } });
+export async function GET(req: NextRequest) {
+  const res = await internalFetch(
+    `/orders/config`,
+    { next: { revalidate: 300 } },
+    req.nextUrl.origin
+  );
   if (!res.ok) {
     return NextResponse.json(
       { error: "Could not fetch payment config" },

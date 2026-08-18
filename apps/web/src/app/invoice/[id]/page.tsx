@@ -1,14 +1,15 @@
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import { PrintButton } from "./PrintButton";
-
-const API_URL =
-  process.env.API_URL ??
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ??
-  process.env.NEXT_PUBLIC_API_URL ??
-  "http://localhost:8000";
+import { internalFetch } from "@/lib/api/server";
 
 async function getInvoice(id: string) {
-  const res = await fetch(`${API_URL}/invoices/${id}`, { cache: "no-store" });
+  const h = await headers();
+  const host = h.get("host");
+  const proto = h.get("x-forwarded-proto") ?? "https";
+  const origin = host ? `${proto}://${host}` : undefined;
+
+  const res = await internalFetch(`/invoices/${id}`, { cache: "no-store" }, origin);
   if (!res.ok) return null;
   return res.json();
 }
@@ -82,11 +83,12 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
           .no-print { display: none !important; }
           body { margin: 0; }
         }
-        @page { size: A4; margin: 12mm; }
+        @page { size: A4; margin: 8mm; }
       `}</style>
 
       {/* ── Invoice ── */}
-      <div style={{ maxWidth: 800, margin: "0 auto", border: "2px solid #000", fontFamily: "Arial, sans-serif" }}>
+      <div style={{ maxWidth: 800, margin: "0 auto", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+      <div style={{ minWidth: 620, border: "2px solid #000", fontFamily: "Arial, sans-serif" }}>
 
         {/* Title */}
         <div style={{ textAlign: "center", borderBottom: "1px solid #000", padding: "6px 0" }}>
@@ -195,8 +197,8 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
               <td style={tdR}>{fmtNum(inv.taxable_value)}</td>
             </tr>
             {/* Padding rows */}
-            {[...Array(4)].map((_, i) => (
-              <tr key={i} style={{ height: 22 }}>
+            {[...Array(2)].map((_, i) => (
+              <tr key={i} style={{ height: 18 }}>
                 <td style={td} />
                 <td style={td} />
                 <td style={td} />
@@ -297,8 +299,8 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
               We declare that this invoice shows the actual price of the goods described
               and that all particulars are true and correct.
             </div>
-            <div style={{ marginTop: 20 }}>
-              <div style={{ borderTop: "1px solid #999", display: "inline-block", width: 120, marginTop: 20 }} />
+            <div style={{ marginTop: 12 }}>
+              <div style={{ borderTop: "1px solid #999", display: "inline-block", width: 120, marginTop: 12 }} />
               <div style={{ fontSize: 10, color: "#777" }}>Customer&apos;s Seal and Signature</div>
             </div>
           </div>
@@ -325,9 +327,9 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
                 </table>
               </>
             )}
-            <div style={{ textAlign: "right", marginTop: 20 }}>
+            <div style={{ textAlign: "right", marginTop: 12 }}>
               <div style={{ fontWeight: 600, fontSize: 12 }}>for {inv.seller_name}</div>
-              <div style={{ height: 40 }} />
+              <div style={{ height: 26 }} />
               <div style={{ borderTop: "1px solid #999", display: "inline-block", width: 120 }} />
               <div style={{ fontSize: 10, color: "#777" }}>Authorised Signatory</div>
             </div>
@@ -338,6 +340,7 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
         <div style={{ borderTop: "1px solid #000", padding: "4px 10px", textAlign: "center", fontSize: 10, color: "#555" }}>
           This is a Computer Generated Invoice
         </div>
+      </div>
       </div>
     </div>
   );

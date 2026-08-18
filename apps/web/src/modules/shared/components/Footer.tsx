@@ -98,7 +98,7 @@ export default function Footer() {
           {/* ── Col 1: Brand blurb ──────────────────────────────────── */}
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <Image src="/images/logo-icon-white.png" alt="" aria-hidden="true" width={164} height={99}
+              <Image src="/images/logo-icon-white.png" alt="" aria-hidden="true" width={757} height={589}
                 style={{ height: 28, width: "auto", flexShrink: 0 }} />
               <p
                 style={{

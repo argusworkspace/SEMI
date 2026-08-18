@@ -6,6 +6,7 @@ node_modules/
 # Next.js
 apps/web/.next/
 apps/web/out/
+apps/web/tsconfig.tsbuildinfo
 
 # Python
 __pycache__/

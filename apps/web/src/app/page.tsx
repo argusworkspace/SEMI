@@ -153,32 +153,15 @@ export default function Home() {
         }}
         className="hero-section"
       >
-        {/* Layer 1 — static poster: always rendered, this is what mobile shows */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/hero-poster.jpg"
-          alt=""
-          aria-hidden="true"
-          style={{
-            position: "absolute", inset: 0,
-            width: "100%", height: "100%",
-            objectFit: "cover",
-            // Center the subject on all screen sizes including portrait mobile
-            objectPosition: "center center",
-            zIndex: 0,
-          }}
-        />
-
-        {/* Layer 2 — video: mounts only on desktop (≥768px), zero bytes on mobile */}
+        {/* Layer 1 — auto-advancing showcase slideshow, all screen sizes */}
         <HeroBackground />
 
-        {/* Layer 3 — dark overlay for text contrast */}
+        {/* Layer 2 — dark overlay for text contrast */}
         <div
           aria-hidden="true"
           style={{
             position: "absolute", inset: 0,
             backgroundColor: "rgba(15, 27, 45, 0.70)",
-            // z-index 2: above the poster (0) and the desktop video (1)
             zIndex: 2,
             pointerEvents: "none",
           }}

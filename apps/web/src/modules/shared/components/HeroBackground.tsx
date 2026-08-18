@@ -1,50 +1,73 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import Image from "next/image";
 
 /**
  * HeroBackground
  *
- * All screen sizes: renders a looping, muted <video> that fills the hero
- *   section. Uses objectFit "cover" with objectPosition "center center" so
- *   the center of the frame is always visible.
+ * Auto-advancing showcase slideshow (replaces the old hero video). Every
+ * image is stacked in the same box and crossfaded via opacity, so nothing
+ * needs to re-mount or reflow when the active slide changes — smoother than
+ * swapping `src` on a single <img>, and works identically on every screen
+ * size (no separate mobile/desktop path like the video needed).
  *
- * Mobile: `playsInline` is required for autoplay on iOS Safari.
- *         `muted` is required for autoplay on all browsers without user gesture.
- *
- * SSR: returns null until mounted (avoids hydration mismatch).
+ * next/image with `fill` + `sizes="100vw"` lets the browser fetch a
+ * device-appropriate width instead of always downloading the full 1920px
+ * asset — the actual "adapt to every screen" optimization. Only the first
+ * slide is `priority` (eager, no lazy delay) so it doesn't block LCP; the
+ * rest load lazily since they're already in view but not yet visible.
  */
+const SHOWCASE_IMAGES = [
+  "/images/showcase/showcase-1.webp",
+  "/images/showcase/showcase-2.webp",
+  "/images/showcase/showcase-3.webp",
+  "/images/showcase/showcase-4.webp",
+  "/images/showcase/showcase-5.webp",
+  "/images/showcase/showcase-6.webp",
+];
+
+const SLIDE_INTERVAL_MS = 2000;
+const FADE_MS = 900;
+
 export default function HeroBackground() {
-  const [mounted, setMounted] = useState(false);
+  const [index, setIndex] = useState(0);
+  const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReducedMotion(mq.matches);
+    const onChange = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
   }, []);
 
-  // Avoid SSR/hydration mismatch — render only after mount
-  if (!mounted) return null;
+  useEffect(() => {
+    if (reducedMotion) return;
+    const timer = setInterval(() => {
+      setIndex((i) => (i + 1) % SHOWCASE_IMAGES.length);
+    }, SLIDE_INTERVAL_MS);
+    return () => clearInterval(timer);
+  }, [reducedMotion]);
 
   return (
-    <video
-      autoPlay
-      muted
-      loop
-      playsInline
-      poster="/images/hero-poster.jpg"
-      aria-hidden="true"
-      style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
-        objectFit: "cover",
-        objectPosition: "center center",
-        // Above poster (z-index 0), below dark overlay (z-index 2)
-        zIndex: 1,
-      }}
-    >
-      <source src="/videos/hero-bg.mp4" type="video/mp4" />
-    </video>
+    <div aria-hidden="true" style={{ position: "absolute", inset: 0, zIndex: 0 }}>
+      {SHOWCASE_IMAGES.map((src, i) => (
+        <Image
+          key={src}
+          src={src}
+          alt=""
+          fill
+          priority={i === 0}
+          sizes="100vw"
+          style={{
+            objectFit: "cover",
+            objectPosition: "center center",
+            opacity: i === index ? 1 : 0,
+            transition: reducedMotion ? "none" : `opacity ${FADE_MS}ms ease`,
+          }}
+        />
+      ))}
+    </div>
   );
 }

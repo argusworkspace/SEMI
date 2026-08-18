@@ -32,6 +32,11 @@ const ACHIEVEMENTS = [
     caption:
       "SEMY was showcased to Raj Madhuram, Co-Founder & CTO of C1X Inc, as an innovative electric mobility solution bringing sustainable transportation to the community.",
   },
+  {
+    image: "/images/acheivements/iskcon-swami.jpeg",
+    title: "Presented to HH BHAKTI VINOD SWAMI, ISKCON LEADER",
+    caption: "Presented to HH BHAKTI VINOD SWAMI, ISKCON LEADER",
+  },
 ];
 
 export default function Home() {
@@ -69,7 +74,15 @@ export default function Home() {
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
 
-  const scrollToProducts = () => { window.location.hash = "products"; };
+  // Scroll directly rather than relying on the "hashchange" event — the browser
+  // only fires that event when the hash actually changes, so this silently did
+  // nothing if the hash was already "#products" (e.g. clicked once already, or
+  // arrived via a #products link).
+  function scrollToProducts() {
+    setActiveSection("products");
+    document.getElementById("products")?.scrollIntoView({ behavior: "smooth" });
+    if (window.location.hash !== "#products") window.location.hash = "products";
+  }
 
   return (
     <>
@@ -156,6 +169,8 @@ export default function Home() {
             position: "absolute", inset: 0,
             width: "100%", height: "100%",
             objectFit: "cover",
+            // Center the subject on all screen sizes including portrait mobile
+            objectPosition: "center center",
             zIndex: 0,
           }}
         />
@@ -169,7 +184,8 @@ export default function Home() {
           style={{
             position: "absolute", inset: 0,
             backgroundColor: "rgba(15, 27, 45, 0.70)",
-            zIndex: 1,
+            // z-index 2: above the poster (0) and the desktop video (1)
+            zIndex: 2,
             pointerEvents: "none",
           }}
         />

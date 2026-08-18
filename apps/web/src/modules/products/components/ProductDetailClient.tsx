@@ -136,6 +136,11 @@ export default function ProductDetailClient({ product }: { product: Product }) {
           box-shadow: 0 0 0 3px rgba(212,168,67,0.2);
           transform: scale(1.08);
         }
+
+        @media (max-width: 480px) {
+          .pd-whatsapp-cta { flex-direction: column; align-items: stretch; text-align: center; }
+          .pd-whatsapp-btn { width: 100%; }
+        }
       `}</style>
 
       <div className="layout-container page-top-offset" style={{ paddingBottom: 56 }}>
@@ -259,7 +264,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
           </p>
           <ol style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 8 }}>
             {[
-              { step: "Pay a small advance to reserve your e-cycle.", detail: "A fully refundable ₹2,000 advance secures your booking." },
+              { step: "Pay the advance to reserve your bike.", detail: "A ₹5,000 advance via UPI secures your booking." },
               { step: "We confirm colour & prepare your delivery.", detail: "Our team calls you within 24 hours to confirm." },
               { step: "Pay the balance on delivery.", detail: "Cash or UPI when the bike arrives at your door." },
             ].map(({ step, detail }, i) => (
@@ -272,7 +277,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
         </div>
 
         {/* More queries? WhatsApp */}
-        <div style={{ marginTop: 16, padding: "18px 20px", border: "1.5px dashed #E2DDD6", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+        <div className="pd-whatsapp-cta" style={{ marginTop: 16, padding: "18px 20px", border: "1.5px dashed #E2DDD6", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
           <p style={{ margin: 0, fontSize: 13, fontFamily: "var(--font-inter), sans-serif", color: "#8896A5" }}>
             Have more queries about this bike?
           </p>
@@ -280,8 +285,9 @@ export default function ProductDetailClient({ product }: { product: Product }) {
             href="https://wa.me/917358110762"
             target="_blank"
             rel="noopener noreferrer"
+            className="pd-whatsapp-btn"
             style={{
-              display: "inline-flex", alignItems: "center", gap: 7,
+              display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 7,
               padding: "10px 18px", background: "#0F1B2D", color: "#F7F3EE",
               fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 13, fontWeight: 700,
               borderRadius: 8, textDecoration: "none", flexShrink: 0,

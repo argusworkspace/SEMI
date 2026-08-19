@@ -147,7 +147,9 @@ export default function Home() {
       <section
         id="home"
         style={{
-          minHeight: "100svh",
+          /* minHeight is intentionally omitted here — CSS owns it:
+             globals.css @media (max-width:767px) → 65svh (reduces portrait crop on mobile)
+             globals.css @media (min-width:768px)  → 100svh (full-viewport cinematic on desktop) */
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -173,12 +175,14 @@ export default function Home() {
           }}
         />
 
-        {/* Content */}
+        {/* Content — paddingTop clears the fixed header (marginTop:-56px pulls the section
+             up behind it, so content needs to push down by the same amount) */}
         <div
-          className="anim-fade-up visible"
+          className="anim-fade-up visible hero-content-inner"
           style={{
             maxWidth: "1200px", width: "100%", textAlign: "center",
             position: "relative", zIndex: 10,
+            paddingTop: "56px",   /* desktop header height */
           }}
         >
           <h1
@@ -203,7 +207,6 @@ export default function Home() {
             }}
           >
             Electric bikes built for power, range, and everyday reliability.
-            Book yours with just ₹5,000 advance.
           </p>
           <button onClick={scrollToProducts} className="hero-btn" style={{ width: "auto", maxWidth: "100%" }}>
             Explore Our Bikes

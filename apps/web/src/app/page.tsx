@@ -26,6 +26,11 @@ const ACHIEVEMENTS = [
     title: "Riders Love It",
     caption: "One of our riders with his SEMY — built tough, ridden daily.",
   },
+  {
+    image: "/images/acheivements/iskcon-swami.jpeg",
+    title: "Presented to HH BHAKTI VINOD SWAMI, ISKCON LEADER",
+    caption: "Presented to HH BHAKTI VINOD SWAMI, ISKCON LEADER",
+  },
 ];
 
 export default function Home() {
@@ -63,7 +68,15 @@ export default function Home() {
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
 
-  const scrollToProducts = () => { window.location.hash = "products"; };
+  // Scroll directly rather than relying on the "hashchange" event — the browser
+  // only fires that event when the hash actually changes, so this silently did
+  // nothing if the hash was already "#products" (e.g. clicked once already, or
+  // arrived via a #products link).
+  function scrollToProducts() {
+    setActiveSection("products");
+    document.getElementById("products")?.scrollIntoView({ behavior: "smooth" });
+    if (window.location.hash !== "#products") window.location.hash = "products";
+  }
 
   return (
     <>
@@ -150,6 +163,8 @@ export default function Home() {
             position: "absolute", inset: 0,
             width: "100%", height: "100%",
             objectFit: "cover",
+            // Center the subject on all screen sizes including portrait mobile
+            objectPosition: "center center",
             zIndex: 0,
           }}
         />
@@ -163,7 +178,8 @@ export default function Home() {
           style={{
             position: "absolute", inset: 0,
             backgroundColor: "rgba(15, 27, 45, 0.70)",
-            zIndex: 1,
+            // z-index 2: above the poster (0) and the desktop video (1)
+            zIndex: 2,
             pointerEvents: "none",
           }}
         />
@@ -263,8 +279,9 @@ export default function Home() {
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(280px, 100%), 1fr))", gap: 16, maxWidth: "1000px", margin: "0 auto" }}>
           {[
-            { label: "Mission", title: "Accessible Electric Mobility", description: "Make electric two-wheelers affordable, reliable, and practical for every Indian commuter." },
-            { label: "Vision", title: "Cleaner, Smarter Cities", description: "Lead India's transition to sustainable urban transport through innovation and quality." },
+            { label: "Vision", title: "Leading Sustainable Urban Commuting", description: "We aim to redefine how campuses and cities move, replacing outdated, polluting transport with smart, people-friendly, eco-conscious solutions — one responsible ride at a time." },
+            { label: "Mission", title: "Empowering Smart, Sustainable Mobility", description: "We empower communities with innovative electric & pedal-powered cycles offering safe, smart, sustainable mobility — designed for campus and short-distance travel, accessible and affordable for everyone." },
+            { label: "SEMY", title: "Reconnect With Your Childhood", description: "Every journey begins with a bicycle — a timeless companion of childhood carrying joy, freedom, and memories. Ride with us and reconnect with the spirit of your childhood." },
             { label: "Values", title: "Built to Last", description: "Honest pricing, customer-first service, and products designed for durability. Made in India 🇮🇳" },
           ].map((item) => (
             <div key={item.label} className="about-card">
@@ -289,7 +306,7 @@ export default function Home() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(280px, 100%), 1fr))", gap: 16, maxWidth: "1000px", margin: "0 auto" }}>
             {[
               { label: "Phone", value: "+91 73581 10762", href: "tel:+917358110762", note: "Mon–Sat, 9 AM – 6 PM IST" },
-              { label: "Email", value: "hello@semy.in", href: "mailto:hello@semy.in", note: "We'll respond within 24 hours" },
+              { label: "Email", value: "semy.office@gmail.com", href: "mailto:semy.office@gmail.com", note: "We'll respond within 24 hours" },
               { label: "WhatsApp", value: "Message Us ↗", href: "https://wa.me/917358110762", note: "Quick replies during business hours", external: true },
             ].map((contact) => (
               <a

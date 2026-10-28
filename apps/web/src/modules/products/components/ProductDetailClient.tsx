@@ -136,6 +136,11 @@ export default function ProductDetailClient({ product }: { product: Product }) {
           box-shadow: 0 0 0 3px rgba(212,168,67,0.2);
           transform: scale(1.08);
         }
+
+        @media (max-width: 480px) {
+          .pd-whatsapp-cta { flex-direction: column; align-items: stretch; text-align: center; }
+          .pd-whatsapp-btn { width: 100%; }
+        }
       `}</style>
 
       <div className="layout-container page-top-offset" style={{ paddingBottom: 56 }}>
@@ -259,7 +264,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
           </p>
           <ol style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 8 }}>
             {[
-              { step: "Pay a small advance to reserve your e-cycle.", detail: "A fully refundable ₹2,000 advance secures your booking." },
+              { step: "Pay the advance to reserve your bike.", detail: "A ₹5,000 advance via UPI secures your booking." },
               { step: "We confirm colour & prepare your delivery.", detail: "Our team calls you within 24 hours to confirm." },
               { step: "Pay the balance on delivery.", detail: "Cash or UPI when the bike arrives at your door." },
             ].map(({ step, detail }, i) => (
@@ -269,6 +274,29 @@ export default function ProductDetailClient({ product }: { product: Product }) {
               </li>
             ))}
           </ol>
+        </div>
+
+        {/* More queries? WhatsApp */}
+        <div className="pd-whatsapp-cta" style={{ marginTop: 16, padding: "18px 20px", border: "1.5px dashed #E2DDD6", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+          <p style={{ margin: 0, fontSize: 13, fontFamily: "var(--font-inter), sans-serif", color: "#8896A5" }}>
+            Have more queries about this bike?
+          </p>
+          <a
+            href="https://wa.me/917358110762"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="pd-whatsapp-btn"
+            style={{
+              display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 7,
+              padding: "10px 18px", background: "#0F1B2D", color: "#F7F3EE",
+              fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 13, fontWeight: 700,
+              borderRadius: 8, textDecoration: "none", flexShrink: 0,
+              transition: "transform 150ms ease",
+            }}
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="#D4A843"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.226 1.36.194 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12.001 2C6.478 2 2 6.477 2 12c0 1.876.52 3.633 1.42 5.13L2 22l4.995-1.393A9.947 9.947 0 0 0 12.001 22C17.524 22 22 17.523 22 12S17.524 2 12.001 2zm0 18.062a8.05 8.05 0 0 1-4.109-1.128l-.294-.175-3.055.852.822-3.005-.192-.309A8.056 8.056 0 1 1 20.06 12a8.067 8.067 0 0 1-8.059 8.062z"/></svg>
+            Ask on WhatsApp
+          </a>
         </div>
       </div>
     </>

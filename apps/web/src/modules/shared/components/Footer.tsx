@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
   COLOR_VOLT,
 } from "@/lib/design-tokens";
@@ -97,21 +98,8 @@ export default function Footer() {
           {/* ── Col 1: Brand blurb ──────────────────────────────────── */}
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-               <span
-                  aria-hidden="true"
-                  style={{
-                    width: 24, height: 24,
-                    background: "linear-gradient(135deg, #D4A843, #F0C060)",
-                    borderRadius: 4,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    flexShrink: 0,
-                    fontFamily: "var(--font-space-grotesk), sans-serif",
-                    fontSize: 12, fontWeight: 700,
-                    color: "#0F1B2D",
-                  }}
-                >
-                  S
-                </span>
+              <Image src="/images/logo-icon-white.png" alt="" aria-hidden="true" width={757} height={589}
+                style={{ height: 28, width: "auto", flexShrink: 0 }} />
               <p
                 style={{
                   fontFamily: "var(--font-space-grotesk), sans-serif",
@@ -154,8 +142,8 @@ export default function Footer() {
           <div>
             <ColHeading>Contact</ColHeading>
             <FooterLink href="tel:+917358110762">+91 73581 10762</FooterLink>
-            <FooterLink href="mailto:hello@semy.in" external>
-              hello@semy.in
+            <FooterLink href="mailto:semy.office@gmail.com" external>
+              semy.office@gmail.com
             </FooterLink>
             <FooterLink href="https://wa.me/917358110762" external>
               WhatsApp Us ↗
